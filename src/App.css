@@ -1,0 +1,138 @@
+#root {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0.2rem;
+  text-align: center;
+  height: 100%;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fill-mobile {
+  width: 100%;
+  max-width: 800px;
+  flex: 1;
+}
+
+@media (max-width: 750px) {
+  .fill-mobile {
+    width: 100%;
+  }
+}
+
+main {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+p {
+  margin: 0;
+  padding: 10px 0;
+}
+
+.card {
+  padding: 2em;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+}
+.MuiTabs-list button {
+  border-radius: var(--radius);
+}
+
+.margin-bottom {
+  margin-bottom: 30px;
+}
+
+.green-header {
+  margin-bottom: 0px;
+  border-radius: var(--radius);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+
+  background-color: var(--color3);
+  border: 1px solid var(--color2);
+}
+
+.bg-white {
+  background-color: rgba(240, 238, 226, 0.5);
+}
+
+.harvest-container {
+  border-radius: var(--radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.harvest-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.harvest-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.harvest-input {
+  border-radius: var(--radius);
+  padding: 0.25rem;
+  width: 4rem;
+  text-align: center;
+}
+
+.harvest-year-label {
+  margin-left: 0.2rem;
+}
+
+.harvest-container {
+  background-color: var(--color2);
+  border: 1px solid var(--text);
+}
+
+.table-container .table-header {
+  border-bottom: 0px;
+}
+.table-container table th {
+  background-color: var(--color3);
+}
+table th:first-of-type {
+  border-left: 1px solid var(--color2);
+}
+table th:last-of-type {
+  border-right: 1px solid var(--color2);
+}
+
+.instructions {
+  margin: 0.1rem;
+  font-size: 0.8rem;
+}
+pre {
+  text-align: left;
+  margin: 0.3rem;
+}
+
+.ulven-t .pallekarm {
+  display: none;
+}
