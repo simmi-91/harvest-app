@@ -11,7 +11,7 @@ const HarvestDetails = ({ harvestData, selectedPlant }) => {
 
   const plantInfo = harvestData.find((item) => item.plant === selectedPlant);
 
-  if (!plantInfo) {
+  if (!plantInfo.info && !plantInfo.tips) {
     return (
       <p className="text-red">Fant ikke informasjon for {selectedPlant}.</p>
     );
@@ -22,10 +22,10 @@ const HarvestDetails = ({ harvestData, selectedPlant }) => {
       <h3 className="green-header">{selectedPlant}</h3>
       <div className="bg-white">
         <p className="">
-          <strong>Slik høster du:</strong> {plantInfo.harvest_info}
+          <strong>Slik høster du:</strong> <br/>{plantInfo.info}
         </p>
         <p className="padding-top">
-          <strong>Tips:</strong> {plantInfo.use_tips}
+          <strong>Tips:</strong> <br/>{plantInfo.tips}
         </p>
       </div>
     </div>

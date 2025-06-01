@@ -57,6 +57,14 @@ p {
   border-radius: var(--radius);
 }
 
+.less-margin{
+  margin: -0.2em;
+}
+
+button.mini-button  {
+  width: 25px;
+}
+
 .margin-bottom {
   margin-bottom: 30px;
 }

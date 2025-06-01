@@ -31,6 +31,7 @@ const HarvestOverview = () => {
   const [availableLocations, setAvailableLocations] = useState([]);
   const allLocations = [
     "Tak B",
+    "Tak F",
     "Tak L",
     "Tak Ulven T",
     "Åkeren på Ulven T",
@@ -67,7 +68,6 @@ const HarvestOverview = () => {
           );
         }
         const plantsData = await plantsResponse.json();
-
         if (plantsData.success) {
           // Create a map of plant_id to plant data
           const plantsMap = new Map(
@@ -76,7 +76,8 @@ const HarvestOverview = () => {
               {
                 name: plant.name,
                 category: plant.category,
-                info: plant.info,
+                info: plant.harvest_info,
+                tips: plant.use_tips,
               },
             ])
           );
@@ -90,9 +91,8 @@ const HarvestOverview = () => {
               year: parseInt(currentYear), // Ensure year is a number
               plant: plantData ? plantData.name : "Ukjent plante",
               category: plantData ? plantData.category : null,
-              harvestInstructions:
-                plantData?.info || "Ingen instruksjoner tilgjengelig.",
-              usageTips: plantData?.info || "Ingen tips tilgjengelig.",
+              info: plantData ? plantData.info : "Ingen instruksjoner tilgjengelig.",
+              tips: plantData ? plantData.tips : "Ingen tips tilgjengelig.",
             };
           });
 

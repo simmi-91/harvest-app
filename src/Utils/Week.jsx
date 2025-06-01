@@ -1,8 +1,9 @@
-// Hjelpefunksjon for å beregne ukenummer
-export const getWeekNumber = (date) => {
-  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-  const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+export const getWeekNumber = (d) => {
+  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return weekNo;
 };
 
 export const getInitialWeekAndYear = (useAdjustedWeek = false) => {
@@ -17,8 +18,7 @@ export const getInitialWeekAndYear = (useAdjustedWeek = false) => {
 
   const dayOfWeek = today.getDay(); // 0 for søndag, 1 for mandag, ..., 6 for lørdag
   let dateToUseForWeekCalculation = new Date(today);
-  if (dayOfWeek < 3) {
-    // 3 = onsdag
+  if (dayOfWeek < 3) {// 3 = onsdag
     dateToUseForWeekCalculation.setDate(today.getDate() - 4);
   }
 
@@ -42,3 +42,4 @@ export const getFormattedToday = () => {
   const parts = formattedDateIntl.split("/");
   return `${parts[0]}.${parts[1]}.${parts[2]}`;
 };
+

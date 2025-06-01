@@ -15,6 +15,16 @@ const HarvestWeek = ({ onFetchData, currentWeek, currentYear }) => {
   const [inputWeek, setInputWeek] = useState(initialWeek);
   const [inputYear, setInputYear] = useState(initialYear);
 
+  const handleWeekChange = (increment) => {
+    const weekInput = document.getElementById('weekInput');
+    const min = Number(weekInput.min);
+    const max = Number(weekInput.max);
+    const newWeek = Number(inputWeek) + increment;
+    if (newWeek >= min && newWeek <= max) {
+      setInputWeek(newWeek);
+    }
+  };
+
   // Oppdaterer inputfeltene når currentWeek/currentYear endres eksternt (f.eks. ved initial lasting)
   useEffect(() => {
     if (isFirstRender.current) {
@@ -39,6 +49,7 @@ const HarvestWeek = ({ onFetchData, currentWeek, currentYear }) => {
         <label htmlFor="weekInput" className="harvest-label">
           Uke:
         </label>
+        <button onClick={() => handleWeekChange(-1)} className="mini-button less-margin">-</button>
         <input
           type="number"
           id="weekInput"
@@ -48,6 +59,8 @@ const HarvestWeek = ({ onFetchData, currentWeek, currentYear }) => {
           min="1"
           max="53"
         />
+        <button onClick={() => handleWeekChange(1)} className="mini-button less-margin">+</button>
+
         <label htmlFor="yearInput" className="harvest-label harvest-year-label">
           År:
         </label>
