@@ -14,6 +14,7 @@
   width: 100%;
   max-width: 800px;
   flex: 1;
+  padding-bottom: 5em;
 }
 
 @media (max-width: 750px) {
@@ -125,10 +126,10 @@ button.mini-button  {
 .table-container table th {
   background-color: var(--color3);
 }
-table th:first-of-type {
+.border table th:first-of-type {
   border-left: 1px solid var(--color2);
 }
-table th:last-of-type {
+.border table th:last-of-type {
   border-right: 1px solid var(--color2);
 }
 
