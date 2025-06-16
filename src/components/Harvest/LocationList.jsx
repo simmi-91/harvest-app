@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@mui/material";
 
 const LocationList = ({
   locations,
@@ -29,6 +30,7 @@ const LocationList = ({
           >
             {location}
           </button>
+
         );
       })}
     </div>

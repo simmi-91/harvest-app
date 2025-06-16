@@ -14,22 +14,21 @@
   background-position: center;
   background-size: cover;
 
-  --color1: #f9c7d4; /*  */
-  --color2: #859e91; /*  */
-  --color3: #c3d0a8; /*  */
-  --color4: #f0eee2; /*  */
-  --color5: #f7e0e4; /*  */
-  --color6: #99ac73; /*  */
-  --text: #242524; /*  */
+  --color1: #f9c7d4;
+  --color2: #859e91;
+  --color3: #c3d0a8;
+  --color4: #f0eee2;
+  --color5: #f7e0e4;
+  --color6: #99ac73;
+  --text: #242524;
   --radius: 8px;
 
   color: var(--text);
   background-color: var(--color5);
 }
 
-/*colors*/
-
-input {
+input,
+.input-styling {
   color: var(--text);
   border: 1px solid var(--text);
   background-color: var(--color3);
@@ -40,24 +39,6 @@ a {
 a:hover {
   color: var(--color1);
 }
-button {
-  color: var(--text);
-  border-color: var(--text);
-  background-color: var(--color2);
-}
-button:hover {
-  background-color: var(--color1);
-}
-button[disabled] {
-  color: var(--color3);
-}
-button.active {
-  background-color: var(--color5);
-}
-button.empty {
-  color: var(--color3);
-}
-/**/
 
 pre {
   margin: 0;
@@ -81,8 +62,10 @@ h1 {
 }
 
 button {
+  color: var(--text);
+  background-color: var(--color2);
   border-radius: var(--radius);
-  border: 1px solid;
+  border: 1px solid var(--text);
   margin: 0.1em;
   font-size: 1em;
   font-weight: 500;
@@ -90,10 +73,28 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 30px;
+  min-height: 30px;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+button:hover {
+  background-color: var(--color1);
+}
+button[disabled] {
+  color: var(--color3);
+}
+button.active {
+  background-color: var(--color5);
+}
+button.empty {
+  color: var(--color3);
+}
+button.mini-button  {
+  width: 30px;
+  height: 30px;
 }
 
 table {
@@ -111,6 +112,9 @@ table {
 @media (prefers-color-scheme: light) {
 }
 
+.text-white {
+  color: white;
+}
 .text-red {
   color: red;
 }

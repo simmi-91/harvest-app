@@ -18,8 +18,8 @@ const HarvestDetails = ({ harvestData, selectedPlant }) => {
   }
 
   return (
-    <div className="margin-bottom">
-      <h3 className="green-header">{selectedPlant}</h3>
+    <div className="mb-l">
+      <h3 className="bg-light border-light round-top mb-0">{selectedPlant}</h3>
       <div className="bg-white">
         <p className="">
           <strong>Slik høster du:</strong> <br/>{plantInfo.info}

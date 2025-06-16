@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Textarea from "@mui/joy/Textarea";
+import WeekYear from "../WeekYear";
 import {
   getInitialWeekAndYear,
   getWeekNumber,
   getFormattedToday,
 } from "../../Utils/Week";
-import { plantApi, harvestApi } from "../../Utils/Paths";
+import { plantApi, harvestApi, replacementsApi } from "../../Utils/Paths";
 
 const InsertHarvest = () => {
   // Get initial week and year using the utility function
@@ -18,7 +19,7 @@ const InsertHarvest = () => {
 
   const [inputWeek, setInputWeek] = useState(initialWeek);
   const [inputYear, setInputYear] = useState(initialYear);
-  const [tableData, setTableData] = useState("");
+  const [jsonData, setJsonData] = useState("");
   const [inputData, setInputData] = useState("");
   const [plantsData, setPlantsData] = useState("");
   const [activePlantData, setactivePlantData] = useState([]);
@@ -26,8 +27,8 @@ const InsertHarvest = () => {
   const [NewplantsResponse, setNewplantsResponse] = useState();
   const [isValidJson, setIsValidJson] = useState(false);
   const [isDataCleaned, setIsDataCleaned] = useState(false);
+  const [replacements, setReplacements] = useState([]);
 
-  // Dummy data string
   const dummyData = `Løpestikke Åkeren på
 Ulven T
 4 stilker 7 stilker
@@ -38,6 +39,10 @@ Gressløk NY! Tak F + D
 Ulven T
 En halv plante 1 plante
 Jordbær NY! 2 stk
+Reddik NY! Tak B,
+Kasse 14-
+17
+4 reddik 8 reddik
 `;
 
   const fetchPlants = async () => {
@@ -59,12 +64,10 @@ Jordbær NY! 2 stk
     }
   };
 
-  // Fetch plants data on component mount // Need to be first!
   useEffect(() => {
     fetchPlants();
   }, []);
 
-  // Run findPotentialPlants when inputData changes
   useEffect(() => {
     if (plantsData.length > 0) {
       findPotentialPlants(inputData);
@@ -74,7 +77,7 @@ Jordbær NY! 2 stk
   useEffect(() => {
     //setInputData(dummyData); // Set dummy data on load
   }, []);
-
+  
   useEffect(() => {
     if (isFirstRender.current) {
       setInputWeek(initialWeek);
@@ -83,25 +86,47 @@ Jordbær NY! 2 stk
     }
   }, [initialWeek, initialYear]);
 
+  // Add this useEffect to fetch replacements when component mounts
+  useEffect(() => {
+    const fetchReplacements = async () => {
+      try {
+        const response = await fetch(replacementsApi());
+        if (!response.ok) {
+          throw new Error(`Failed to fetch replacements: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.success) {
+          // Convert string patterns to RegExp objects
+          const processedReplacements = data.data.map(rep => ({
+            pattern: new RegExp(rep.pattern, 'g'),
+            replacement: rep.replacement
+          }));
+          setReplacements(processedReplacements);
+        }
+      } catch (err) {
+        console.error("Error fetching replacements:", err);
+      }
+    };
+
+    fetchReplacements();
+  }, []);
+
   const cleanInput = () => {
-    //fetch plants data
     let formattedData = inputData;
     let foundPlants = [];
     plantsData.forEach((plant) => {
-      const regex = new RegExp(`(?:^|\\s*)${plant.name}(?:\\s*|$)`, "gi");
-      formattedData = formattedData.replace(regex, `\n\n${plant.name}\n`);
+      const regex = new RegExp(`(^|\\D\\s)(?:\\s*)?${plant.name}(?:\\s*|$)`, "gi");
+      formattedData = formattedData.replace(regex, `$1\n\n${plant.name}\n`);
       foundPlants[plant.id] = plant.name;
     });
     setactivePlantData(foundPlants);
 
-    /*formattedData = formattedData
-      .split("\n")
-      .map((line) => line.trimStart())
-      .join("\n");*/
-
     const replacements = [
+      { pattern: /\*/g, replacement: "" },
       { pattern: /Så\s*mye\s*du\s*vil/g, replacement: "SMDV" },
       { pattern: /Så\s*mye\s*du\s*trenger/g, replacement: "SMDT" },
+      { pattern: /SMDV SMDV/g, replacement: "SMDV" },
+      { pattern: /SMDT SMDT/g, replacement: "SMDT" },
       { pattern: /\s+NY!\s+/g, replacement: "\n" },
       { pattern: /\nUlven/g, replacement: " Ulven" },
       { pattern: /\nhåndfull/g, replacement: " håndfull" },
@@ -109,14 +134,14 @@ Jordbær NY! 2 stk
       { pattern: /Tak F[ \+]+D Ulven T/g, replacement: "Tak Ulven T" },
       { pattern: /,\s*\n\s*/g, replacement: ", " },
       { pattern: /-\n/g, replacement: "-" },
-      { pattern: /En halv plante/g, replacement: "0.5 plante" },
+      { pattern: /En halv /g, replacement: "0.5 " },
       {
         pattern: /Nok\s*til\s*pynt\s*til\s*(\w+)\s*(salat(?:er)?\/)ka\s*ke/g,
         replacement: "Nok til pynt til $1 $2kake",
       },
       {
-        pattern: /kasse\s*(?:\n)?([0-9]+)\s*(?:\n)?/gi,
-        replacement: "kasse $1 ", // fjerner linebreak mellom kasse nummer
+        pattern: /kasse\s*(?:\n)?([0-9]+)\s*(?:\n)?(?:([,+-])\s*([0-9]+))?(?:\n)?/gi,
+        replacement: "kasse $1$2$3\n", // fjerner linebreak mellom kassenummer
       },
       {
         pattern:
@@ -125,7 +150,7 @@ Jordbær NY! 2 stk
       },
     ];
 
-    // Apply all replacements
+    // Apply all replacements from the database
     replacements.forEach(({ pattern, replacement }) => {
       formattedData = formattedData.replace(pattern, replacement);
     });
@@ -136,8 +161,8 @@ Jordbær NY! 2 stk
     return formattedData;
   };
 
-  const handleFormatJsonClick = () => {
-    let cleanedText = cleanInput();
+  const handleFormatJsonClick = (week, year) => {
+    let cleanedText = inputData;
     let foundPlants = "";
 
     try {
@@ -165,7 +190,7 @@ Jordbær NY! 2 stk
           if (position.match("Tak")) {
             // Extract position and plot from Tak format
             const takMatch = position.match(
-              /(Tak\s+[A-Z])\s*,\s*kasse\s*([0-9]+(?:[ ,-]+[0-9]+)?)/i
+              /(Tak\s+[A-Z])\s*,\s*kasse\s*([0-9]+(?:[ +,-]+[0-9]+)?)/i
             );
             if (takMatch) {
               position = takMatch[1];
@@ -219,19 +244,19 @@ Jordbær NY! 2 stk
 
       setactivePlantData(foundPlants);
       if (jsonData.length > 0) {
-        setTableData(JSON.stringify(jsonData, null, 2));
+        setJsonData(JSON.stringify(jsonData, null, 2));
         setIsValidJson(true);
       } else {
-        setTableData("Invalid data format");
+        setJsonData("Invalid data format");
         setIsValidJson(false);
       }
     } catch (err) {
-      setTableData("Error processing data: " + err.message);
+      setJsonData("Error processing data: " + err.message);
       setIsValidJson(false);
     }
   };
 
-  const handleAddHarvestClick = async () => {
+  const handleAddHarvestClick = async (week, year) => {
     try {
       const response = await fetch(harvestApi(), {
         method: "POST",
@@ -239,9 +264,9 @@ Jordbær NY! 2 stk
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          week: inputWeek,
-          year: inputYear,
-          data: JSON.parse(tableData),
+          week: week,
+          year: year,
+          data: JSON.parse(jsonData),
         }),
       });
 
@@ -252,9 +277,17 @@ Jordbær NY! 2 stk
       const result = await response.json();
 
       if (result.success) {
-        //console.log("Harvest data inserted successfully!");
-        setInputData("");
-        setTableData(result.message);
+        // Filter out the processed entries
+        const processedEntries = JSON.parse(jsonData);
+        const processedPlantNames = new Set(processedEntries.map(entry => entry.plant_name));
+        const entries = inputData.split(/\n\n+/);
+        const remainingEntries = entries.filter(entry => {
+          const plantName = entry.trim().split('\n')[0].trim();
+          return !processedPlantNames.has(plantName);
+        });
+        
+        setInputData(remainingEntries.join('\n\n').trim());
+        setJsonData(result.message);
         setIsValidJson(false);
       } else {
         throw new Error(result.message);
@@ -334,34 +367,15 @@ Jordbær NY! 2 stk
 
   return (
     <>
-      <div className="harvest-container">
+      <div className="harvest-container round-top round-bot">
         <h2 className="harvest-title">Legg inn ny høstemelding</h2>
         <div className="harvest-controls">
-          <label htmlFor="weekInput" className="harvest-label">
-            Uke:
-          </label>
-          <input
-            type="number"
-            id="weekInput"
-            value={inputWeek}
-            onChange={(e) => setInputWeek(e.target.value)}
-            className="harvest-input"
-            min="1"
-            max="53"
-          />
-          <label
-            htmlFor="yearInput"
-            className="harvest-label harvest-year-label"
-          >
-            År:
-          </label>
-          <input
-            type="number"
-            id="yearInput"
-            value={inputYear}
-            onChange={(e) => setInputYear(e.target.value)}
-            className="harvest-input"
-            min="2020"
+          <WeekYear 
+            week={initialWeek} 
+            year={initialYear}
+            onWeekChange={(week) => handleFormatJsonClick(week, initialYear)}
+            onYearChange={(year) => handleFormatJsonClick(initialWeek, year)}
+            blnIncrement={true}
           />
         </div>
         <small className="current-info">
@@ -403,6 +417,7 @@ Jordbær NY! 2 stk
       ) : null}
 
       <div className="flex-row ">
+
         <div className="flex-col flex-grow">
           <span>Høste Data fra PDF</span>
           <Textarea
@@ -416,18 +431,16 @@ Jordbær NY! 2 stk
             onChange={handleInputChange}
           />
           <div className="flex-row">
-            {/*
-              <button onClick={cleanInput} className="harvest-button">
-                Auto rydd input
-              </button>
-            */}
-            <button onClick={handleFormatJsonClick} className="harvest-button">
-              Formater og test input
+            <button onClick={cleanInput} className="harvest-button">
+              Auto rydd input
+            </button>
+            <button onClick={() => handleFormatJsonClick(initialWeek, initialYear)} className="harvest-button">
+              Forbered innleggelse
             </button>
           </div>
         </div>
 
-        {tableData ? (
+        {jsonData ? (
           <>
             <div style={{ minWidth: "40%" }}>
               <span>Formatert Json Data</span>
@@ -436,12 +449,12 @@ Jordbær NY! 2 stk
                 maxRows={15}
                 size="sm"
                 variant="outlined"
-                placeholder={tableData}
+                placeholder={jsonData}
               />
               <button
                 id="insertBtn"
                 disabled={!isValidJson}
-                onClick={handleAddHarvestClick}
+                onClick={() => handleAddHarvestClick(initialWeek, initialYear)}
                 className="harvest-button"
               >
                 Legg inn data
@@ -450,6 +463,41 @@ Jordbær NY! 2 stk
           </>
         ) : null}
       </div>
+
+      {jsonData && (() => {
+        try {
+          const parsedData = JSON.parse(jsonData);
+          return Array.isArray(parsedData) ? (
+            <>
+              <div className="table-container border">
+                <div className="table-header bg-light border-light round-top mb-0">Ny data:</div>
+                <table className="harvest-table bg-white">
+                  <thead>
+                    <tr>
+                      <th>Plant</th>
+                      <th>Position</th>
+                      <th>Plot</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {isValidJson && parsedData.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{entry.plant_name}</td>
+                        <td>{entry.position}</td>
+                        <td>{entry.plot}</td>
+                        <td>{entry.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : null;
+        } catch (err) {
+          return null;
+        }
+      })()}
     </>
   );
 };

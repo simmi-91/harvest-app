@@ -15,7 +15,6 @@ const HarvestTable = ({
     acc[item.position].push(item);
     return acc;
   }, {});
-  //console.log("Grouped data:", groupedData);
 
   return (
     <>
@@ -26,7 +25,7 @@ const HarvestTable = ({
             position.includes("Ulven T") ? "ulven-t" : ""
           }`}
         >
-          <h3 className="table-header green-header">{position}</h3>
+          <h3 className="table-header bg-light border-light round-top mb-0">{position}</h3>
           <div className="">
             <table className="bg-white">
               <thead className="">

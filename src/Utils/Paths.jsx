@@ -13,6 +13,11 @@ export const getBasePath = () => {
 export const plantApi = () => {
   return getBasePath() + "api/plants.php";
 };
+
 export const harvestApi = () => {
   return getBasePath() + "api/harvest.php";
+};
+
+export const replacementsApi = () => {
+  return getBasePath() + "api/replacements.php";
 };

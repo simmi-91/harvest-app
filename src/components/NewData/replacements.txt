@@ -1,0 +1,31 @@
+
+INSERT INTO text_replacements (pattern, replacement, description) 
+VALUES ('Så\\s*mye\\s*du\\s*trenger', 'SMDT', 'Replaces "Så mye du trenger" with "SMDT"');
+
+
+    const replacements = [
+      { pattern: /\*/g, replacement: "" },
+      { pattern: /Så\s*mye\s*du\s*vil/g, replacement: "SMDV" },
+      { pattern: /Så\s*mye\s*du\s*trenger/g, replacement: "SMDT" },
+      { pattern: /\s+NY!\s+/g, replacement: "\n" },
+      { pattern: /\nUlven/g, replacement: " Ulven" },
+      { pattern: /\nhåndfull/g, replacement: " håndfull" },
+      { pattern: /Tak\n/g, replacement: "Tak " },
+      { pattern: /Tak F[ \+]+D Ulven T/g, replacement: "Tak Ulven T" },
+      { pattern: /,\s*\n\s*/g, replacement: ", " },
+      { pattern: /-\n/g, replacement: "-" },
+      { pattern: /En halv /g, replacement: "0.5 " },
+      {
+        pattern: /Nok\s*til\s*pynt\s*til\s*(\w+)\s*(salat(?:er)?\/)ka\s*ke/g,
+        replacement: "Nok til pynt til $1 $2kake",
+      },
+      {
+        pattern: /kasse\s*(?:\n)?([0-9]+)\s*(?:\n)?(?:([,+-])\s*([0-9]+))?(?:\n)?/gi,
+        replacement: "kasse $1$2$3\n", // fjerner linebreak mellom kassenummer
+      },
+      {
+        pattern:
+          /(Tak\s+[A-Z])(?:\n)?\s*,\s*(kasse\s*(?:\n)?[0-9]+(?:(?:\n)?[ ,\+\-]+(?:\n)?[0-9]+)?)/gi,
+        replacement: "$1, $2", //slå sammen tak og kasse
+      },
+    ];

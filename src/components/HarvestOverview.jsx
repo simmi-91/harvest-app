@@ -13,9 +13,7 @@ import HarvestDetails, {
 import { getInitialWeekAndYear } from "../Utils/Week";
 import { plantApi, harvestApi } from "../Utils/Paths";
 
-// Hovedkomponent for appen
 const HarvestOverview = () => {
-  /* @type {[HarvestData[], React.Dispatch<React.SetStateAction<HarvestData[]>>]} */
   const [harvestData, setHarvestData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,17 +36,14 @@ const HarvestOverview = () => {
     "Alle",
   ];
 
-  // Funksjon for å hente data fra API-et
-  // Bruk useCallback for å forhindre unødvendig re-rendering av HarvestWeek
   const fetchData = useCallback(async (week, year) => {
     setLoading(true);
     setError(null);
-    setHarvestData([]); // Tøm data før ny lasting
-    setAvailableLocations([]); // Tøm lokasjoner
-    setSelectedPlant(null); // Tøm valgt plante
+    setHarvestData([]);
+    setAvailableLocations([]);
+    setSelectedPlant(null);
 
     try {
-      // Oppdater state for uke og år som hentes
       setCurrentWeek(week);
       setCurrentYear(year);
 
@@ -86,9 +81,9 @@ const HarvestOverview = () => {
             const plantData = plantsMap.get(item.plant_id);
             return {
               ...item,
-              isHarvested: item.done === "1", // Convert done to boolean
-              week: parseInt(currentWeek), // Ensure week is a number
-              year: parseInt(currentYear), // Ensure year is a number
+              isHarvested: item.done === "1",
+              week: parseInt(currentWeek),
+              year: parseInt(currentYear),
               plant: plantData ? plantData.name : "Ukjent plante",
               category: plantData ? plantData.category : null,
               info: plantData ? plantData.info : "Ingen instruksjoner tilgjengelig.",
@@ -96,10 +91,8 @@ const HarvestOverview = () => {
             };
           });
 
-          //console.log("Enriched Data:", enrichedHarvestData);
           setHarvestData(enrichedHarvestData);
 
-          // Finn unike lokasjoner
           const locations = [
             ...new Set(enrichedHarvestData.map((item) => item.position)),
           ];
@@ -115,10 +108,9 @@ const HarvestOverview = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // Tom dependency array betyr at denne funksjonen bare opprettes én gang
+  }, []);
 
   useEffect(() => {
-    // Last inn dagens uke/år automatisk ved første oppstart
     fetchData(initialWeek, initialYear);
   }, [fetchData, initialWeek, initialYear]);
 
@@ -137,7 +129,7 @@ const HarvestOverview = () => {
         },
         body: JSON.stringify({
           id: id,
-          done: newIsHarvested ? "1" : "0", // Convert boolean to "1" or "0"
+          done: newIsHarvested ? "1" : "0",
         }),
       });
 
@@ -162,18 +154,18 @@ const HarvestOverview = () => {
     }
   };
 
-  // Data som sendes til HarvestTable, filtrert på valgt lokasjon
-  const currentWeeksData = harvestData.filter((item) => {
-    return (
-      selectedLocation === "Alle" || // Show all if "Alle" is selected
-      !selectedLocation || // Show all if no location is selected
-      item.position === selectedLocation
-    ); // Show only matching location
-  });
+  const currentWeeksData = harvestData
+    .filter((item) => {
+      return (
+        selectedLocation === "Alle" ||
+        !selectedLocation ||
+        item.position === selectedLocation
+      );
+    })
+    .sort((a, b) => a.position.localeCompare(b.position));
 
   return (
     <div className="">
-      {/* HarvestWeek er alltid synlig for å endre ukenummer */}
       <HarvestWeek
         onFetchData={fetchData}
         currentWeek={currentWeek}
@@ -181,21 +173,18 @@ const HarvestOverview = () => {
       />
 
       {loading ? (
-        // Vis skjelettkomponenter når loading er true
         <>
           <LocationListSkeleton locations={allLocations} />
           <HarvestTableSkeleton />
           <HarvestDetailsSkeleton />
         </>
       ) : error ? (
-        // Vis feilmelding når det er en feil
         <div className="text-red" role="alert">
           <div className="" />
           <strong className="font-bold">Error: </strong>
           <span className="">{error}</span>
         </div>
       ) : (
-        // Vis faktiske komponenter når data er lastet og ingen feil
         <>
           <LocationList
             locations={allLocations}
