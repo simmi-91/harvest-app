@@ -9,7 +9,7 @@ const EditHarvest = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [responseMessage, setResponseMessage] = useState(null);
   
   const [searchPlant, setSearchPlant] = useState(null);
   const [searchWeek, setSearchWeek] = useState("");
@@ -102,8 +102,8 @@ const EditHarvest = () => {
         return newFields;
       });
 
-      setSuccessMessage(result.message);
-      setTimeout(() => setSuccessMessage(null), 3000);
+      setResponseMessage(result.message);
+      setTimeout(() => setResponseMessage(null), 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -115,10 +115,14 @@ const EditHarvest = () => {
     }
 
     try {
-      await deleteHarvestEntry(id);
+      const result = await deleteHarvestEntry(id);
       
       setHarvestData(prevData => prevData.filter(item => item.id !== id));
       setFilteredData(prevData => prevData.filter(item => item.id !== id));
+
+      setResponseMessage(result.message);
+      setTimeout(() => setResponseMessage(null), 3000);
+
     } catch (err) {
       setError(err.message);
     }
@@ -263,8 +267,8 @@ const EditHarvest = () => {
               </tbody>
             </table></div>
           </div>
-          {successMessage && (
-            <footer className="round-top round-bot"><em>{successMessage}</em></footer>
+          {responseMessage && (
+            <footer className="round-top round-bot"><em>{responseMessage}</em></footer>
           )}
           </>
         )}
