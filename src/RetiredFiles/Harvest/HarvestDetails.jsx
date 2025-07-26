@@ -19,14 +19,25 @@ const HarvestDetails = ({ harvestData, selectedPlant }) => {
 
   return (
     <div className="mb-l">
-      <h3 className="bg-light border-light round-top mb-0">{selectedPlant}</h3>
+      <h3 className="bg-light border-light round-top mb-0">
+        {selectedPlant} 
+      </h3>
       <div className="bg-white">
-        <p className="">
+        {plantInfo.latin && (
+          <em>{plantInfo.latin}</em>
+        )}
+         
+        <p className="mr-l ml-l">
           <strong>Slik høster du:</strong> <br/>{plantInfo.info}
         </p>
-        <p className="padding-top">
+
+        <p className="mr-l ml-l">
           <strong>Tips:</strong> <br/>{plantInfo.tips}
         </p>
+
+        {plantInfo.category && (
+          <p><strong>Kategori:</strong> <br/>{plantInfo.category}</p>
+        )}
       </div>
     </div>
   );

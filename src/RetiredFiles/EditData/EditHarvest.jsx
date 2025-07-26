@@ -10,13 +10,13 @@ const EditHarvest = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [responseMessage, setResponseMessage] = useState(null);
-  
+
   const [searchPlant, setSearchPlant] = useState(null);
   const [searchWeek, setSearchWeek] = useState("");
   const [searchYear, setSearchYear] = useState(new Date().getFullYear().toString());
   const [searchLocation, setSearchLocation] = useState(null);
   const [editableFields, setEditableFields] = useState({});
-  
+
   const uniqueLocations = [...new Set(harvestData.map(item => item.position))]
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
@@ -39,32 +39,32 @@ const EditHarvest = () => {
         setLoading(false);
       }
     };
-    
+
     loadData();
   }, []);
 
   const handleSearch = () => {
     let filtered = [...harvestData];
-    
+
     if (searchPlant) {
       filtered = filtered.filter(item => {
         const plant = plantsData.find(p => p.plant_id === item.plant_id);
         return plant && plant.name === searchPlant;
       });
     }
-    
+
     if (searchWeek && searchYear) {
-      filtered = filtered.filter(item => 
-        item.week === parseInt(searchWeek) && item.year === parseInt(searchYear)
+      filtered = filtered.filter(item =>
+        String(item.week) === String(searchWeek) && String(item.year) === String(searchYear)
       );
     }
-    
+
     if (searchLocation) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.position === searchLocation
       );
     }
-    
+
     setFilteredData(filtered);
   };
 
@@ -84,18 +84,18 @@ const EditHarvest = () => {
 
     try {
       const result = await updateHarvestEntry(id, updatedFields);
-      
-      setHarvestData(prevData => 
-        prevData.map(item => 
+
+      setHarvestData(prevData =>
+        prevData.map(item =>
           item.id === id ? { ...item, ...updatedFields } : item
         )
       );
-      setFilteredData(prevData => 
-        prevData.map(item => 
+      setFilteredData(prevData =>
+        prevData.map(item =>
           item.id === id ? { ...item, ...updatedFields } : item
         )
       );
-      
+
       setEditableFields(prev => {
         const newFields = { ...prev };
         delete newFields[id];
@@ -116,7 +116,7 @@ const EditHarvest = () => {
 
     try {
       const result = await deleteHarvestEntry(id);
-      
+
       setHarvestData(prevData => prevData.filter(item => item.id !== id));
       setFilteredData(prevData => prevData.filter(item => item.id !== id));
 
@@ -137,9 +137,9 @@ const EditHarvest = () => {
     <div className="container">
       <div className="harvest-container round-top round-bot">
         <h2 className="harvest-title">Endre Høstedata</h2>
-                
+
         <div className="flex-row flex-wrap harvest-controls">
-          
+
           <Autocomplete
             value={searchPlant}
             onChange={(event, newValue) => {
@@ -172,8 +172,8 @@ const EditHarvest = () => {
             style={{ width: 200 }}
           />
 
-          <WeekYear 
-            week={searchWeek} 
+          <WeekYear
+            week={searchWeek}
             year={searchYear}
             onWeekChange={setSearchWeek}
             onYearChange={setSearchYear}
@@ -189,89 +189,89 @@ const EditHarvest = () => {
         </div>
       </div>
 
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div className="text-red">{error}</div>
-        ) : (
-          <>
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div className="text-red">{error}</div>
+      ) : (
+        <>
           <div className="table-container border">
             <div className="table-header bg-light border-light round-top mb-0">&nbsp;</div>
-            <div style={{overflowX: 'scroll'}}>
-            <table className="harvest-table bg-white">
-              <thead>
-                <tr>
-                  <th>Plante</th>
-                  <th>Uke/År</th>
-                  <th>Høstet</th>
-                  <th>Pallekarmnr</th>
-                  <th>Plot</th>
-                  <th>Mengde</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData
-                  .sort((a, b) => {
-                    if (a.plant_id !== b.plant_id) return a.plant_id - b.plant_id;
-                    return a.week - b.week;
-                  })
-                  .map((entry) => (
-                  <tr key={entry.id}>
-                    <td>{getPlantName(entry.plant_id)}</td>
-                    <td>{entry.week}/{entry.year}</td>
-                    <td>{entry.done}</td>
-                    <td>
-                      <input
-                        type="text"
-                        value={editableFields[entry.id]?.position || entry.position}
-                        onChange={(e) => handleEdit(entry.id, 'position', e.target.value)}
-                        className="border"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={editableFields[entry.id]?.plot || entry.plot}
-                        onChange={(e) => handleEdit(entry.id, 'plot', e.target.value)}
-                        className="border input-sm"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={editableFields[entry.id]?.amount || entry.amount}
-                        onChange={(e) => handleEdit(entry.id, 'amount', e.target.value)}
-                        className="border"
-                      />
-                    </td>
-                    <td>
-                      <div className="flex-row gap-2">
-                        <button
-                          onClick={() => handleSubmit(entry.id)}
-                          className="round-top round-bot"
-                          disabled={!editableFields[entry.id]}
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => handleDelete(entry.id)}
-                          className="round-top round-bot"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+            <div style={{ overflowX: 'scroll' }}>
+              <table className="harvest-table bg-white">
+                <thead>
+                  <tr>
+                    <th>Plante</th>
+                    <th>Uke/År</th>
+                    <th>Høstet</th>
+                    <th>Pallekarmnr</th>
+                    <th>Plot</th>
+                    <th>Mengde</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table></div>
+                </thead>
+                <tbody>
+                  {filteredData
+                    .sort((a, b) => {
+                      if (a.plant_id !== b.plant_id) return a.plant_id - b.plant_id;
+                      return a.week - b.week;
+                    })
+                    .map((entry) => (
+                      <tr key={entry.id}>
+                        <td>{getPlantName(entry.plant_id)}</td>
+                        <td>{entry.week}/{entry.year}</td>
+                        <td>{entry.done}</td>
+                        <td>
+                          <input
+                            type="text"
+                            value={editableFields[entry.id]?.position || entry.position}
+                            onChange={(e) => handleEdit(entry.id, 'position', e.target.value)}
+                            className="border"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={editableFields[entry.id]?.plot || entry.plot}
+                            onChange={(e) => handleEdit(entry.id, 'plot', e.target.value)}
+                            className="border input-sm"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={editableFields[entry.id]?.amount || entry.amount}
+                            onChange={(e) => handleEdit(entry.id, 'amount', e.target.value)}
+                            className="border"
+                          />
+                        </td>
+                        <td>
+                          <div className="flex-row gap-2">
+                            <button
+                              onClick={() => handleSubmit(entry.id)}
+                              className="round-top round-bot"
+                              disabled={!editableFields[entry.id]}
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => handleDelete(entry.id)}
+                              className="round-top round-bot"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table></div>
           </div>
           {responseMessage && (
             <footer className="round-top round-bot"><em>{responseMessage}</em></footer>
           )}
-          </>
-        )}
+        </>
+      )}
     </div>
   );
 };

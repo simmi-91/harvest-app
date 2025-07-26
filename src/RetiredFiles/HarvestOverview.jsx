@@ -13,6 +13,28 @@ import HarvestDetails, {
 import { getInitialWeekAndYear } from "../Utils/Week";
 import { plantApi, harvestApi } from "../Utils/Paths";
 
+// Helper to split combined location strings, handling single-letter suffixes
+function splitLocations(locationString) {
+  // Replace ' og ' with ',' for uniform splitting
+  const parts = locationString.replace(/\s+og\s+/g, ",").split(",");
+  let lastPrefix = "";
+  return parts
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((loc) => {
+      // If the location contains a space, update the prefix (e.g., 'Tak B')
+      if (loc.includes(" ")) {
+        lastPrefix = loc.split(" ")[0];
+        return loc;
+      }
+      // If it's a single letter, prepend the last prefix
+      if (loc.length === 1 && lastPrefix) {
+        return `${lastPrefix} ${loc}`;
+      }
+      return loc;
+    });
+}
+
 const HarvestOverview = () => {
   const [harvestData, setHarvestData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,13 +86,14 @@ const HarvestOverview = () => {
         }
         const plantsData = await plantsResponse.json();
         if (plantsData.success) {
-          // Create a map of plant_id to plant data
           const plantsMap = new Map(
             plantsData.data.map((plant) => [
               plant.plant_id,
               {
                 name: plant.name,
+                latin: plant.latin,
                 category: plant.category,
+                variant: plant.variant,
                 info: plant.harvest_info,
                 tips: plant.use_tips,
               },
@@ -85,6 +108,8 @@ const HarvestOverview = () => {
               week: parseInt(currentWeek),
               year: parseInt(currentYear),
               plant: plantData ? plantData.name : "Ukjent plante",
+              latin: plantData ? plantData.latin : null,
+              variant: plantData ? plantData.variant : null,
               category: plantData ? plantData.category : null,
               info: plantData ? plantData.info : "Ingen instruksjoner tilgjengelig.",
               tips: plantData ? plantData.tips : "Ingen tips tilgjengelig.",
@@ -156,11 +181,9 @@ const HarvestOverview = () => {
 
   const currentWeeksData = harvestData
     .filter((item) => {
-      return (
-        selectedLocation === "Alle" ||
-        !selectedLocation ||
-        item.position === selectedLocation
-      );
+      if (selectedLocation === "Alle" || !selectedLocation) return true;
+      const locations = splitLocations(item.position);
+      return locations.includes(selectedLocation);
     })
     .sort((a, b) => a.position.localeCompare(b.position));
 

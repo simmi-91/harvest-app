@@ -92,13 +92,18 @@ button.active {
 button.empty {
   color: var(--color3);
 }
-button.mini-button  {
+
+button.mini {
   width: 30px;
   height: 30px;
 }
+input.mini {
+  width: 100px;
+  height: 25px;
+}
 
 table {
-  width: 100%;
+  /*width: 100%;*/
   border-collapse: collapse;
 }
 .border table th,
@@ -121,3 +126,18 @@ table {
 .font-bold {
   font-weight: bold;
 }
+
+/*
+.tab {
+  border: thin solid gray;
+  margin: 0 5px -1px 5px;
+  padding: 0 5px;
+}
+.tab.active,
+.tab:hover {
+  background-color: #f0eee2;
+  cursor: pointer;
+}
+.menu-wrapper {
+  border-bottom: thin solid gray;
+}*/

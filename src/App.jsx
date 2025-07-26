@@ -1,102 +1,140 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { CircularProgress, Stack } from "@mui/material";
 import "./App.css";
 
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { getWeekNumber, getFormattedToday, getInitialWeekAndYear } from "./Utils/Week";
+import { fetchPlants, fetchHarvestData } from "./Utils/DataFetching";
 
-import HarvestOverview from "./components/HarvestOverview";
-import InsertHarvest from "./components/NewData/InsertHarvest";
-
-import EditPlant from "./components/EditData/EditPlant";
-import EditHarvest from "./components/EditData/EditHarvest";
-import EditReplacements from "./components/EditData/EditReplacements";
-
-import { ThemeProvider } from '@mui/material/styles';
-import gardenTheme from './theme';
+import Header from "./components/Header";
+import Navigation from "./components/Navigation";
+import HarvestView from "./components/HarvestView";
+import EditHarvestView from "./components/EditHarvestView";
+import AddNewHarvest from "./components/AddNewHarvest";
 
 function App() {
-  const [activeTab, setActiveTab] = useState("harvest");
-  const [activeSubTab, setActiveSubTab] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChange = (event, newValue) => {
-    if (newValue !== "edit") {
-      setActiveTab(newValue);
-      setActiveSubTab(null);
+  const mainmenu = ['høste', 'legg inn', 'rediger'];
+  const submenu = ['høstedata', 'planter'];
+  const [activeTab, setActiveTab] = useState(mainmenu[0]);
+  const [activeSubTab, setActiveSubTab] = useState('');
+
+  const [harvestData, setHarvestData] = useState([]);
+  const [plantData, setPlantsData] = useState([]);
+
+  const strToday = getFormattedToday();
+  const { week: initialWeek, year: initialYear } = getInitialWeekAndYear(true);
+  const [currentWeek, setCurrentWeek] = useState(initialWeek);
+  const [currentYear, setCurrentYear] = useState(initialYear);
+
+  const adressPositions = {
+    "Ulvenpark": ['B', 'F', 'L'],
+    "Ulven T": ['Tak', 'Åker'],
+    "Alle": ['B', 'F', 'L', 'Tak', 'Åker']
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [newPlants, newHarvests] = await Promise.all([
+        fetchPlants(),
+        fetchHarvestData()
+      ]);
+
+      newHarvests
+        .sort((a, b) => {
+          if (a.week !== b.week) {
+            return a.week - b.week;
+          }
+          if (a.plot_order !== b.plot_order) {
+            return a.plot_order - b.plot_order;
+          }
+          return a.name.localeCompare(b.name);
+        })
+        .map(item => {
+          if (item.full_location) {
+            // eksempel: [Ulvenpark|F|12-14],[Ulvenpark|L|49+50],[Ulven T|Åker]
+            const locArray = item.full_location.match(/\[[^\]]*\]/g) || [];
+            item.locationArray = locArray;
+          }
+        });
+
+      setPlantsData(newPlants);
+      setHarvestData(newHarvests);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleMenuItemClick = (value) => {
-    setActiveTab("edit");
-    setActiveSubTab(value);
-    handleClose();
-  };
+  useEffect(() => {
+    loadData();
+  }, [currentWeek, currentYear]);
 
   return (
     <>
-      <ThemeProvider theme={gardenTheme}>
-      </ThemeProvider>
+      <Stack direction="column">
 
-      <div className="flex-col fill-mobile">
-        <Tabs
-          value={activeTab}
-          onChange={handleChange}
-          indicatorColor="primary"
-          variant="fullWidth"
-        >
-          <Tab value="harvest" label="Høste" />
-          <Tab value="insert" label="Ny data" />
-          <Tab 
-            value="edit"
-            label="Endre"
-            onClick={handleClick}
-          />
-        </Tabs>
+        <Navigation
+          mainmenu={mainmenu} submenu={submenu}
+          activeTab={activeTab} setActiveTab={setActiveTab}
+          activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab}
+        />
 
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem onClick={() => handleMenuItemClick("editharvest")}>Høstedata</MenuItem>
-          <MenuItem onClick={() => handleMenuItemClick("editplants")}>Plante data - TODO</MenuItem>
-          <MenuItem onClick={() => handleMenuItemClick("editregex")}>Regex for PDF formatering - TODO</MenuItem>
-        </Menu>
+        <Header
+          date={strToday}
+          week={currentWeek}
+          year={currentYear}
+          blnIncrement={true}
+          setCurrentWeek={setCurrentWeek}
+          setCurrentYear={setCurrentYear}
+        />
 
-        {activeTab === "harvest" ? (
+        {error ? (error) : null}
+
+        {loading ? (
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Stack>
+        ) :
           <>
-            <HarvestOverview />
+            {activeTab === "høste" ? (
+              <HarvestView
+                harvestData={harvestData}
+                week={currentWeek}
+                year={currentYear}
+                adressPositions={adressPositions}
+              />
+            ) : activeTab === "legg inn" ? (
+              <AddNewHarvest />
+            ) : activeTab === "rediger" && activeSubTab === "planter" ? (
+              <>rediger planter - TODO</>
+            ) : activeTab === "rediger" && activeSubTab === "høstedata" ? (
+              <EditHarvestView
+                harvestData={harvestData}
+                week={currentWeek}
+                year={currentYear}
+                adressPositions={adressPositions}
+              />
+            ) : null}
           </>
-        ) : activeTab === "insert" ? (
-          <>
-            <InsertHarvest />
-          </>
-        ) : activeTab === "edit" && activeSubTab === "editharvest" ? (
-          <>
-            <EditHarvest />
-          </>
-        ) : activeTab === "edit" && activeSubTab === "editplants" ? (
-          <>
-            <EditPlant />
-          </>
-        ) : activeTab === "edit" && activeSubTab === "editregex" ? (
-          <>
-            <EditReplacements />
-          </>
-        ) : null}
-      </div>
-      
+        }
+
+      </Stack>
+
     </>
   );
 }

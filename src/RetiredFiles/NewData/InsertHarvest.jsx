@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Textarea from "@mui/joy/Textarea";
-import WeekYear from "../WeekYear";
+import WeekYear from "../../components/WeekYear";
 import {
   getInitialWeekAndYear,
   getWeekNumber,
@@ -9,7 +9,6 @@ import {
 import { plantApi, harvestApi, replacementsApi } from "../../Utils/Paths";
 
 const InsertHarvest = () => {
-  // Get initial week and year using the utility function
   const { week: initialWeek, year: initialYear } = getInitialWeekAndYear(false);
   const isFirstRender = useRef(true);
 
@@ -19,7 +18,7 @@ const InsertHarvest = () => {
 
   const [inputWeek, setInputWeek] = useState(initialWeek);
   const [inputYear, setInputYear] = useState(initialYear);
-  const [jsonData, setJsonData] = useState("");
+  const [jsonHarvestData, setjsonHarvestData] = useState("");
   const [inputData, setInputData] = useState("");
   const [plantsData, setPlantsData] = useState("");
   const [activePlantData, setactivePlantData] = useState([]);
@@ -28,6 +27,8 @@ const InsertHarvest = () => {
   const [isValidJson, setIsValidJson] = useState(false);
   const [isDataCleaned, setIsDataCleaned] = useState(false);
   const [replacements, setReplacements] = useState([]);
+
+  const [responseMessage, setResponseMessage] = useState(null);
 
   const dummyData = `Løpestikke Åkeren på
 Ulven T
@@ -77,7 +78,7 @@ Kasse 14-
   useEffect(() => {
     //setInputData(dummyData); // Set dummy data on load
   }, []);
-  
+
   useEffect(() => {
     if (isFirstRender.current) {
       setInputWeek(initialWeek);
@@ -122,22 +123,32 @@ Kasse 14-
     setactivePlantData(foundPlants);
 
     const replacements = [
+      { pattern: /TILBAKE TIL OVERSIKTEN\n/g, replacement: "" },
+      { pattern: /(Ulven T)?\s*Grønnsak\s*Bednr[. ]*Enkeltandel\/\s*parandel\s*Familieandel/gi, replacement: "" },
       { pattern: /\*/g, replacement: "" },
-      { pattern: /Så\s*mye\s*du\s*vil/g, replacement: "SMDV" },
-      { pattern: /Så\s*mye\s*du\s*trenger/g, replacement: "SMDT" },
+      { pattern: /\sog\s*/g, replacement: " og " },
+      { pattern: /Så\s*mye\s*(du\s*)?vil/g, replacement: "SMDV" },
+      { pattern: /Så\s*mye\s*(du\s*)?trenger/g, replacement: "SMDT" },
       { pattern: /SMDV SMDV/g, replacement: "SMDV" },
       { pattern: /SMDT SMDT/g, replacement: "SMDT" },
-      { pattern: /\s+NY!\s+/g, replacement: "\n" },
+      { pattern: /\s+NY!\s+/ig, replacement: "\n" },
       { pattern: /\nUlven/g, replacement: " Ulven" },
       { pattern: /\nhåndfull/g, replacement: " håndfull" },
       { pattern: /Tak\n/g, replacement: "Tak " },
-      { pattern: /Tak F[ \+]+D Ulven T/g, replacement: "Tak Ulven T" },
+      { pattern: /Tak [A-Z \+]+ Ulven T/g, replacement: "Tak Ulven T" },
       { pattern: /,\s*\n\s*/g, replacement: ", " },
       { pattern: /-\n/g, replacement: "-" },
       { pattern: /En halv /g, replacement: "0.5 " },
+      { pattern: /I\s*store\s*kasser\s*(på)?/g, replacement: "" },
+      { pattern: /flerårige\s*kasser/g, replacement: "" },
+      { pattern: /[+ ]*rundt\s*kanten\s*på\s*kasse\s*(\d+)/g, replacement: "+$1" },
+      { pattern: /[(+ ]*\w+ som har\s*sneket seg inn[)]*\n/g, replacement: "" },
       {
         pattern: /Nok\s*til\s*pynt\s*til\s*(\w+)\s*(salat(?:er)?\/)ka\s*ke/g,
         replacement: "Nok til pynt til $1 $2kake",
+      }, {
+        pattern: /Nok\s*til\s*en\s*(\w+)\s/g,
+        replacement: "Nok til en $1\n",
       },
       {
         pattern: /kasse\s*(?:\n)?([0-9]+)\s*(?:\n)?(?:([,+-])\s*([0-9]+))?(?:\n)?/gi,
@@ -147,6 +158,16 @@ Kasse 14-
         pattern:
           /(Tak\s+[A-Z])(?:\n)?\s*,\s*(kasse\s*(?:\n)?[0-9]+(?:(?:\n)?[ ,\+\-]+(?:\n)?[0-9]+)?)/gi,
         replacement: "$1, $2", //slå sammen tak og kasse
+      },
+      {
+        pattern:
+          /\s*\n*b\n*l\n*o\n*m\n*s\n*t\n*e\n*r\n*h\n*o\n*d\n*e/gi,
+        replacement: " blomsterhode",
+      },
+      {
+        pattern:
+          /I flere\s*kasser på\s*tak (\w)\n/gi,
+        replacement: "Tak $1\n",
       },
     ];
 
@@ -168,7 +189,7 @@ Kasse 14-
     try {
       // Split input data by double line breaks
       const entries = cleanedText.split(/\n\n+/);
-      const jsonData = entries
+      const jsonHarvestData = entries
         .map((entry) => {
           const lines = entry.trim().split("\n");
           if (lines.length < 3) return null;
@@ -190,13 +211,14 @@ Kasse 14-
           if (position.match("Tak")) {
             // Extract position and plot from Tak format
             const takMatch = position.match(
-              /(Tak\s+[A-Z])\s*,\s*kasse\s*([0-9]+(?:[ +,-]+[0-9]+)?)/i
+              /(Tak\s+(?:[A-Z]|[A-Z][,A-Zog ]{4,10}))\s*,\s*kasse\s*([0-9]+(?:[ +,-]+[0-9]+)?)/i
             );
             if (takMatch) {
               position = takMatch[1];
               plot = takMatch[2] || "0";
             }
           }
+          position = position.charAt(0).toUpperCase() + position.slice(1);
 
           // Extract first number from plot for plot_order
           const plotOrder = plot.toString().match(/\d+/);
@@ -243,20 +265,21 @@ Kasse 14-
         .filter((entry) => entry !== null);
 
       setactivePlantData(foundPlants);
-      if (jsonData.length > 0) {
-        setJsonData(JSON.stringify(jsonData, null, 2));
+      if (jsonHarvestData.length > 0) {
+        setjsonHarvestData(JSON.stringify(jsonHarvestData, null, 2));
         setIsValidJson(true);
       } else {
-        setJsonData("Invalid data format");
+        setjsonHarvestData("Invalid data format");
         setIsValidJson(false);
       }
     } catch (err) {
-      setJsonData("Error processing data: " + err.message);
+      setjsonHarvestData("Error processing data: " + err.message);
       setIsValidJson(false);
     }
   };
 
   const handleAddHarvestClick = async (week, year) => {
+    setResponseMessage("Laster...");
     try {
       const response = await fetch(harvestApi(), {
         method: "POST",
@@ -266,7 +289,7 @@ Kasse 14-
         body: JSON.stringify({
           week: week,
           year: year,
-          data: JSON.parse(jsonData),
+          data: JSON.parse(jsonHarvestData),
         }),
       });
 
@@ -277,23 +300,23 @@ Kasse 14-
       const result = await response.json();
 
       if (result.success) {
-        // Filter out the processed entries
-        const processedEntries = JSON.parse(jsonData);
+        const processedEntries = JSON.parse(jsonHarvestData);
         const processedPlantNames = new Set(processedEntries.map(entry => entry.plant_name));
         const entries = inputData.split(/\n\n+/);
         const remainingEntries = entries.filter(entry => {
           const plantName = entry.trim().split('\n')[0].trim();
           return !processedPlantNames.has(plantName);
         });
-        
+        setResponseMessage(result.message);
         setInputData(remainingEntries.join('\n\n').trim());
-        setJsonData(result.message);
+        setjsonHarvestData([]);
         setIsValidJson(false);
       } else {
         throw new Error(result.message);
       }
     } catch (err) {
-      console.error("Error inserting harvest data:", err);
+      //console.error("Error inserting harvest data:", err);
+      setResponseMessage(`Error inserting harvest data: ${err.message}`);
     }
   };
 
@@ -329,8 +352,7 @@ Kasse 14-
         throw new Error(result.message);
       }
     } catch (err) {
-      console.error(err, result.error);
-      alert(result.message);
+      setNewplantsResponse(`Error inserting plants data: ${err.message}`);
     }
   };
 
@@ -339,13 +361,14 @@ Kasse 14-
     let newPlants = [];
 
     // Look for "NY!" pattern to find new plants
-    const newPlantMatches = data.match(/(^|\n)[A-Za-zÆØÅæøå ]+\s+NY\!\s+/g);
+    const newPlantMatches = data.match(/(^|\n)(?:\w+\/-\n*)?[A-Za-zÆØÅæøå ]+\s+NY\!\s+/ig);
 
     if (newPlantMatches) {
       newPlantMatches.forEach((match) => {
-        // Extract plant name by removing "NY!" and any surrounding text
-        const plantName = match.replace(/\s*NY\!\s+/, "").trim();
+        let plantName = match.replace(/\s*NY\!\s+/i, "").trim();
         if (plantName) {
+          plantName = plantName.replace(/\n/, "");
+
           // Check if plant already exists in plantsData
           const plantExists = plantsData.find(
             (plant) => plant.name.toLowerCase() === plantName.toLowerCase()
@@ -370,8 +393,8 @@ Kasse 14-
       <div className="harvest-container round-top round-bot">
         <h2 className="harvest-title">Legg inn ny høstemelding</h2>
         <div className="harvest-controls">
-          <WeekYear 
-            week={initialWeek} 
+          <WeekYear
+            week={initialWeek}
             year={initialYear}
             onWeekChange={(week) => handleFormatJsonClick(week, initialYear)}
             onYearChange={(year) => handleFormatJsonClick(initialWeek, year)}
@@ -393,7 +416,7 @@ Kasse 14-
 
       {NewplantsData.length > 0 ? (
         <>
-          <p>
+          <p className="round-top round-bot bg-white border-dark">
             <span>Fant nye planter i lista:&nbsp;</span>
             <span>{NewplantsData.join(", ")} &nbsp;</span>
 
@@ -440,7 +463,7 @@ Kasse 14-
           </div>
         </div>
 
-        {jsonData ? (
+        {jsonHarvestData ? (
           <>
             <div style={{ minWidth: "40%" }}>
               <span>Formatert Json Data</span>
@@ -449,7 +472,7 @@ Kasse 14-
                 maxRows={15}
                 size="sm"
                 variant="outlined"
-                placeholder={jsonData}
+                placeholder={jsonHarvestData}
               />
               <button
                 id="insertBtn"
@@ -464,13 +487,13 @@ Kasse 14-
         ) : null}
       </div>
 
-      {jsonData && (() => {
+      {jsonHarvestData && (() => {
         try {
-          const parsedData = JSON.parse(jsonData);
+          const parsedData = JSON.parse(jsonHarvestData);
           return Array.isArray(parsedData) ? (
             <>
               <div className="table-container border">
-                <div className="table-header bg-light border-light round-top mb-0">Ny data:</div>
+                <h3 className="table-header bg-light border-light round-top mb-0">Ny data:</h3>
                 <table className="harvest-table bg-white">
                   <thead>
                     <tr>
@@ -498,6 +521,12 @@ Kasse 14-
           return null;
         }
       })()}
+
+      {responseMessage && (
+        <footer className="round-top round-bot">
+          <em style={{ whiteSpace: 'pre-line' }}>{responseMessage}</em>
+        </footer>
+      )}
     </>
   );
 };

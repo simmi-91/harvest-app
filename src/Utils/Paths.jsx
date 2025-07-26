@@ -3,7 +3,7 @@ export const getBasePath = () => {
   let folder = window.location.pathname;
 
   if (import.meta.env.MODE === "development") {
-    domain=import.meta.env.VITE_API_HOST;
+    domain = import.meta.env.VITE_API_HOST;
     folder = `/garden/samdyrk/`;
     //folder = `/demo/harvest/`;
   }
@@ -20,4 +20,12 @@ export const harvestApi = () => {
 
 export const replacementsApi = () => {
   return getBasePath() + "api/replacements.php";
+};
+
+export const pdfparserApi = () => {
+  return getBasePath() + "api/pdfparser.php";
+};
+
+export const uploadPdfApi = () => {
+  return getBasePath() + "api/uploadPdf.php";
 };

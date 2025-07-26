@@ -19,10 +19,9 @@ export const fetchPlants = async () => {
 
 export const fetchHarvestData = async (week = null, year = null) => {
   try {
-    const url = week && year 
-      ? `${harvestApi()}?week=${week}&year=${year}`
-      : harvestApi();
-      
+    const url =
+      week && year ? `${harvestApi()}?week=${week}&year=${year}` : harvestApi();
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch harvest data: ${response.status}`);
@@ -41,15 +40,15 @@ export const fetchHarvestData = async (week = null, year = null) => {
 export const updateHarvestEntry = async (id, updatedFields) => {
   try {
     const response = await fetch(`${harvestApi()}?id=${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(updatedFields),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update harvest data');
+      throw new Error("Failed to update harvest data");
     }
     const result = await response.json();
     if (!result.success) {
@@ -64,11 +63,11 @@ export const updateHarvestEntry = async (id, updatedFields) => {
 export const deleteHarvestEntry = async (id) => {
   try {
     const response = await fetch(`${harvestApi()}?id=${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete harvest data');
+      throw new Error("Failed to delete harvest data");
     }
     const result = await response.json();
     if (!result.success) {
@@ -81,14 +80,14 @@ export const deleteHarvestEntry = async (id) => {
 };
 
 export const enrichHarvestData = (harvestData, plantsData) => {
-  return harvestData.map(item => {
-    const plant = plantsData.find(p => p.plant_id === item.plant_id);
+  return harvestData.map((item) => {
+    const plant = plantsData.find((p) => p.plant_id === item.plant_id);
     return {
       ...item,
-      plant_name: plant ? plant.name : 'Unknown Plant',
+      plant_name: plant ? plant.name : "Unknown Plant",
       plant_category: plant ? plant.category : null,
       plant_info: plant ? plant.harvest_info : null,
       plant_tips: plant ? plant.use_tips : null,
     };
   });
-}; 
+};

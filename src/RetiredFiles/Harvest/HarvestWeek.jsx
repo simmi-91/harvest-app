@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { getWeekNumber, getFormattedToday } from "../../Utils/Week";
-import WeekYear from "../WeekYear";
+import WeekYear from "../../components/WeekYear";
 
 const HarvestWeek = ({ onFetchData, currentWeek, currentYear }) => {
 
@@ -23,14 +23,14 @@ const HarvestWeek = ({ onFetchData, currentWeek, currentYear }) => {
     <div className="harvest-container round-top round-bot">
       <h2 className="harvest-title">Høstemelding</h2>
       <div className="harvest-controls">
-        <WeekYear 
-          week={initialWeek} 
+        <WeekYear
+          week={initialWeek}
           year={initialYear}
           onWeekChange={(week) => handleFetchClick(week, initialYear)}
           onYearChange={(year) => handleFetchClick(initialWeek, year)}
           blnIncrement={true}
         />
-        <button onClick={() => handleFetchClick(initialWeek, initialYear)} className="harvest-button">Last inn</button>  
+        <button onClick={() => handleFetchClick(initialWeek, initialYear)} className="harvest-button">Last inn</button>
       </div>
 
       <small className="current-info">
