@@ -316,45 +316,8 @@ du vil
               }
             })
             .filter(Boolean) as string[];
-          let lines = result.message.split(/\n/);
-          console.log(lines);
 
-          const added: string[] = [];
-          const alreadyExists: string[] = [];
-          if (lines && lines.length > 0) {
-            lines.forEach((line: string) => {
-              if (line.includes("La inn:")) {
-                // Extracts "Nepe" from "La inn: Nepe for uke:30"
-                const match = line.match(/La inn: (.+) for uke:\d+/);
-                if (match && match[1]) {
-                  added.push(match[1].trim());
-                }
-              } else if (line.includes("finnes allerede i databasen.")) {
-                // Extracts "Gul løk" from "Gul løk for uke:30 finnes allerede i databasen."
-                const match = line.match(
-                  /(.+) for uke:\d+ finnes allerede i databasen\./
-                );
-                if (match && match[1]) {
-                  alreadyExists.push(match[1].trim());
-                }
-              }
-            });
-          }
-
-          let msg = "";
-          if (added.length > 0) {
-            const addedString = added.join(", ");
-            msg += "La inn: " + addedString + " . ";
-          }
-          if (alreadyExists.length > 0) {
-            const alreadyExistsString = alreadyExists.join(", ");
-            msg += "Disse fantes allerede: " + alreadyExistsString;
-          }
-          if (msg !== "") {
-            setResponseMessage(msg);
-          } else {
-            setResponseMessage("Lagt inn i databasen.");
-          }
+          setResponseMessage(result.message);
           setResponseMessageType("success");
           setManualHarvestTextInput(remainingEntries.join("\n\n").trim() ?? "");
           setjsonHarvestData([]);
