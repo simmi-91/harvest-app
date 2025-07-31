@@ -32,6 +32,9 @@ p {
   margin: 0;
   padding: 10px 0;
 }
+.MuiToolbar-root li {
+  margin: 1px 3px;
+}
 
 .card {
   padding: 2em;
@@ -48,7 +51,7 @@ p {
 .flex-grow {
   flex-grow: 1;
 }
-.flex-wrap{
+.flex-wrap {
   flex-wrap: wrap;
 }
 
@@ -59,20 +62,18 @@ p {
   justify-content: center;
 }
 
-
-
-.ml-sm{
+.ml-sm {
   margin-left: 0.5rem;
- }
-.mr-sm{
- margin-right: 0.5rem;
+}
+.mr-sm {
+  margin-right: 0.5rem;
 }
 
-.ml-l{
+.ml-l {
   margin-left: 1rem;
- }
-.mr-l{
- margin-right: 1rem;
+}
+.mr-l {
+  margin-right: 1rem;
 }
 
 .mb-0 {
@@ -102,18 +103,18 @@ p {
   border: 1px solid var(--color2);
 }
 
-.round-top{
+.round-top {
   border-top-right-radius: var(--radius);
   border-top-left-radius: var(--radius);
 }
-.round-bot{
+.round-bot {
   border-bottom-right-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
 }
 
-footer{
+footer {
   position: sticky;
-  bottom:0;
+  bottom: 0;
   z-index: 1;
 
   padding: 0.5rem;
@@ -143,10 +144,10 @@ footer{
   gap: 0.5rem;
 }
 
-.input-sm{
+.input-sm {
   width: 4rem;
 }
-.input-lg{
+.input-lg {
   width: 8rem;
 }
 .harvest-input {
@@ -157,7 +158,6 @@ footer{
 .harvest-year-label {
   margin-left: 0.2rem;
 }
-
 
 .table-container .table-header {
   border-bottom: 0px;
@@ -171,7 +171,6 @@ footer{
 .border th:last-of-type {
   border-right: 1px solid var(--color2);
 }
-
 
 .instructions {
   margin: 0.1rem;

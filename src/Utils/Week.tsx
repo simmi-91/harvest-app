@@ -1,8 +1,10 @@
-export const getWeekNumber = (d) => {
+export const getWeekNumber = (d: Date): number => {
   d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  var weekNo = Math.ceil(
+    ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+  );
   return weekNo;
 };
 
@@ -29,14 +31,16 @@ export const getInitialWeekAndYear = (useAdjustedWeek = false) => {
   };
 };
 
-export const getFormattedToday = () => {
+export const getFormattedToday = (): string => {
   const today = new Date();
-  const options = {
+  const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   };
-  const formattedDateIntl = new Intl.DateTimeFormat("nb-NO", options).format(today);
+  const formattedDateIntl = new Intl.DateTimeFormat("nb-NO", options).format(
+    today
+  );
   return formattedDateIntl;
 };

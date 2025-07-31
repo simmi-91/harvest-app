@@ -1,0 +1,68 @@
+{
+  "compilerOptions": {
+    /* Base Options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    /* If transpiling with TypeScript: */
+    //"module": "NodeNext",
+    "outDir": "dist"
+    // "sourceMap": true,
+
+    /* AND if you're building for a library: */
+    //"declaration": true,
+
+    /* AND if you're building for a library in a monorepo: */
+    //"composite": true,
+    //"declarationMap": true,
+
+    /* If NOT transpiling with TypeScript: */
+    //"module": "preserve",
+    //"noEmit": true,
+
+    /* If your code runs in the DOM: */
+    //"lib": ["es2022", "dom", "dom.iterable"]
+
+    /* If your code doesn't run in the DOM: */
+    //"lib": ["es2022"]
+  },
+  "exclude": ["dist"]
+}
+/*{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": false,
+    // Keep some helpful checks
+    "noUnusedLocals": true,
+    "noImplicitReturns": true
+  }
+}*/
+/*
+{
+  "compilerOptions": {
+    "noImplicitAny": false,           // Allow variables without explicit types
+    "strictNullChecks": false,        // Allow null/undefined assignments
+    "strictFunctionTypes": false,     // Less strict function type checking
+    "strictBindCallApply": false,     // Less strict bind/call/apply checking
+    "strictPropertyInitialization": false, // Don't require class properties to be initialized
+    "noImplicitReturns": false,       // Allow functions without return statements
+    "noImplicitThis": false,          // Allow 'this' without explicit typing
+    "noUnusedLocals": false,          // Don't warn about unused variables
+    "noUnusedParameters": false       // Don't warn about unused parameters
+  }
+}
+*/

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import WeekYear from "../WeekYear";
-import { fetchPlants, fetchHarvestData, updateHarvestEntry, deleteHarvestEntry, enrichHarvestData } from "../../Utils/DataFetching";
+import { fetchPlants, fetchHarvestData, updateHarvestEntry, deleteHarvestEntry } from "../../Utils/DataFetching";
 import { Autocomplete, TextField } from "@mui/material";
 
 const EditHarvest = () => {
@@ -33,15 +33,32 @@ const EditHarvest = () => {
         setHarvestData(harvests);
         const filteredHarvests = harvests.filter(item => item.year === new Date().getFullYear().toString());
         setFilteredData(filteredHarvests);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      catch (err) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("Ukjent error ved henting av høstedata");
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    loadData();
-  }, []);
+      loadData();
+    }, []);
+
+  const enrichHarvestData = (harvestData, plantsData) => {
+    return harvestData.map((item) => {
+      const plant = plantsData.find((p) => p.plant_id === item.plant_id);
+      return {
+        ...item,
+        plant_name: plant ? plant.name : "Unknown Plant",
+        plant_category: plant ? plant.category : null,
+        plant_info: plant ? plant.harvest_info : null,
+        plant_tips: plant ? plant.use_tips : null,
+      };
+    });
+  };
 
   const handleSearch = () => {
     let filtered = [...harvestData];

@@ -1,13 +1,23 @@
-import { useState } from "react";
-import { pdfparserApi, uploadPdfApi } from '../Utils/Paths'
+import React, { useState, useEffect } from "react";
+import { pdfparserApi, uploadPdfApi } from "../Utils/Paths";
 import { TextField, Stack, Button } from "@mui/material";
+import { Event } from "../types";
 
-const AddNewHarvest = () => {
+type fileEntry = {
+  modified: number;
+  name: string;
+  path: string;
+  readable: boolean;
+  size: number;
+};
 
-  const [selectedFile, setSelectedFile] = useState(null);
+const PdfUpload = () => {
+  const [error, setError] = useState("");
+
+  const [selectedFile, setSelectedFile] = useState();
   const [uploadStatus, setUploadStatus] = useState("");
   const [parseStatus, setParseStatus] = useState("");
-  const [folderContent, setFolderContent] = useState([]);
+  const [folderContent, setFolderContent] = useState<fileEntry[]>([]);
   const [fileContent, setFileContent] = useState([
     "Foto: Ulven Park hagelag 2021\n\nHØSTE-\nMELDING\n\nUKE 21\n\nUlven Park\nsamdyrkelag U-REIST IS",
     "Høstemelding uke 21\n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\nGrønnsak Bednr. —|Enkeltandel/ | Familie-\nparandel andel\n\nPipeløk Åkeren på | 5 stk 10 stk\nUlven T\n\nLøpestikke Åkeren på | 4 stilker T stilker\nUlven T\n\nOregano Tak B, En håndfull To\nkasse 18 håndfuller\nUlvenpark\n\nTimian Tak L, Så mye du Så mye\nkasse 48 | trenger du trenger\nUlvenpark\n\nStemorsblomst | Tak B, Nok til pynt til | Nok til\nkasse 19- |ensalat/kake | pynt til to\n23 salater/ka\nUlvenpark ke\n\nRabarbra NY! TakF+D |4 stilker T stilker\nUlven T\n\nGressløk NY! TakF+D | En halv plante |1 plante\nUlven T\n\nMynte NY! Tak F+D | Så mye du Så mye\nUlven T trenger du trenger\n\n \n\n \n\n \n\n \n\n \n\nU-REIST Fresgopet",
@@ -21,11 +31,11 @@ const AddNewHarvest = () => {
     "SPISELIGE BLOMSTER:\nSTEMORSBLOMST\n\nVIOLA TRICOLOR\n\n \n\nSLIK HØSTER DU\n\nKnip kun av selve blomsterhodet med hendene.\nLa knupper sitte igjen på planten slik at det blir\nflere blomster.\n\nTIPS\nFriske eller kandiserte stemorsblomster kan for eksempel\nbrukes som pynt på desserter og kaker. De pynter også\nopp enhver salat, eller du kan fryse dem i isbiter!\n\n«—  ILBAKE TIL OVERSIKTEN U-REIST IBiesiopet",
     "RABARBRA\n\nRHEUM RHABARBARUM\n\n \n\nSLIK HØSTER DU\n\nTa en av de ytre stilkene med hendene og dra\nopp, med en liten vridning. Ikke klipp eller skjær\nav stilkene, da det som er igjen lett begynner å\nråtne. Hvis vi høster flittig setter plantene flere\nstilker. Bladene kan du la ligge igjen på bakken.\nMerk: Rabarbrablader skal ikke spises.\nTIPS\nSaft, pai, kompott, syltetøy! Spede stilker trengs ikke å\n\nskrelles, men på de grovere stilkene bør det ytterste laget av\nskallet fjernes før tilberedning.\n\n«———- 1ILBAKE TIL OVERSIKTEN U*KEIS I |Fåreskjøpst",
     "URTER:\nGRESSLØK\n\nALLIUM SCHOENOPRASUM\n\n \n\nSLIK HØSTER DU\n\nBruk saks eller kniv og klipp ned hele\ngressløktuen et par centimeter over bakken. Fra\nden nedklipte delen vil det snart begynne å\nvokse ut ny gressløk.\n\nTIPS\nSpis knoppene! Fres dem i litt olivenolje og server som\ntilbehør. Godt med litt salt og balsamico på. Stengelen som\nblomsten sitter på er hard og sorteres ut fra resten av\nbunten.\n\n«—— TILBAKE TIL OVERSIKTEN U-REIST Ifieskopet",
-    "URTER: MYNTE\n\nMENTHA\n\n \n\nSLIK HØSTER DU\n\nKlipp eller knip av toppen på planta. La minst et\npar bladpar på stilken stå igjen. Den delen som\nstår igjen forgrener se og lager nye skudd.\n\nTIPS\nDet finnes mange ulike typer mynte. Peppermynte,\ngrønnmynte og eplemynte er noen eksempler. Mynte har\nfrisk smak og passer godt strimlet i salater, som te og i\nkalde drikker.\n\n«— 11LBAKE TIL OVERSIKTEN U:REIST |fiessjopat"
+    "URTER: MYNTE\n\nMENTHA\n\n \n\nSLIK HØSTER DU\n\nKlipp eller knip av toppen på planta. La minst et\npar bladpar på stilken stå igjen. Den delen som\nstår igjen forgrener se og lager nye skudd.\n\nTIPS\nDet finnes mange ulike typer mynte. Peppermynte,\ngrønnmynte og eplemynte er noen eksempler. Mynte har\nfrisk smak og passer godt strimlet i salater, som te og i\nkalde drikker.\n\n«— 11LBAKE TIL OVERSIKTEN U:REIST |fiessjopat",
   ]);
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]); // Get the first selected file
+  const handleFileChange = (e: Event) => {
+    setSelectedFile(e.target.files[0]); // Get the first selected file
   };
 
   const getFolderContent = async () => {
@@ -45,16 +55,20 @@ const AddNewHarvest = () => {
 
       if (result.folder_content) {
         setFolderContent(result.folder_content);
-      }
-      else {
+      } else {
         setFolderContent([]);
       }
 
       return result;
     } catch (err) {
-      setUploadStatus(`Error posting pdf. ${err.message}`);
+      if (err instanceof Error) {
+        setError(err.message);
+        setUploadStatus(`Error ved henting av filer i mappen. ${err.message}`);
+      } else {
+        setError("Ukjent error ved henting av høstedata");
+      }
+    } finally {
     }
-
   };
 
   const handleUpload = async () => {
@@ -64,7 +78,7 @@ const AddNewHarvest = () => {
     }
 
     const formData = new FormData();
-    formData.append('myFile', selectedFile); // 'myFile' is the field name your server expects
+    formData.append("myFile", selectedFile);
 
     setUploadStatus("Uploading...");
     try {
@@ -77,7 +91,7 @@ const AddNewHarvest = () => {
         throw new Error("Failed to post pdf");
       }
       const result = await response.json();
-      console.log('result: ', result);
+      console.log("result: ", result);
 
       if (!result.success) {
         throw new Error(result.message);
@@ -88,11 +102,15 @@ const AddNewHarvest = () => {
 
       return result;
     } catch (err) {
-      setUploadStatus(`Error posting pdf. ${err.message}`);
+      if (err instanceof Error) {
+        setUploadStatus(`Error ved opplasting av pdf. ${err.message}`);
+      } else {
+        setUploadStatus("Ukjent error ved opplasting av pdf");
+      }
     }
   };
 
-  const parseFile = async (path) => {
+  const parseFile = async (path: string) => {
     setParseStatus("Parsing...");
 
     try {
@@ -103,7 +121,7 @@ const AddNewHarvest = () => {
         throw new Error(`Failed to fetch file data: ${response.status}`);
       }
       const data = await response.json();
-      console.log('data: ', data);
+      console.log("data: ", data);
 
       if (data.success) {
         setParseStatus("successful!");
@@ -113,66 +131,78 @@ const AddNewHarvest = () => {
         throw new Error(data.message);
       }
     } catch (err) {
-      setParseStatus(`Error parsing pdf. ${err.message}`);
-      throw new Error(`Error fetching harvest data: ${err.message}`);
+      if (err instanceof Error) {
+        setParseStatus(`Error ved parsing av pdf. ${err.message}`);
+      } else {
+        setParseStatus("Ukjent error ved henting av høstedata");
+      }
     }
-
   };
 
-  const cleanText = (text) => {
+  const cleanText = (text: string) => {
     let cleanedtext = text;
     cleanedtext = cleanedtext.replace(/\n\n\s*/g, "\n\n");
     cleanedtext = cleanedtext.replace(/«—.+$/, "");
     cleanedtext = cleanedtext.replace(/U-REIST.+$/, "");
     return cleanedtext;
-  }
+  };
 
   const displayFileContent = () => {
-    const cleanedContent = fileContent.map(page => cleanText(page));
+    const cleanedContent = fileContent.map((page) => cleanText(page));
 
     const pages = cleanedContent.map((text, i) => ({
       pagenumber: i + 1,
-      text: text
+      text: text,
     }));
 
-    let html =
-      pages.map((page) => (
-        <p key={page.pagenumber}>
-          <b>side: {page.pagenumber}</b>
-          <br /><span>{page.text}</span>
-        </p>
-      ))
+    let html = pages.map((page) => (
+      <p key={page.pagenumber}>
+        <b>side: {page.pagenumber}</b>
+        <br />
+        <span>{page.text}</span>
+      </p>
+    ));
     //<br /><textarea value={page.text} />
-    return (
-      <Stack >{html}</Stack>);
+    return <Stack>{html}</Stack>;
   };
+
+  useEffect(() => {
+    console.log("folderContent", folderContent);
+  }, [folderContent]);
 
   return (
     <>
-      <p>
-        * TODO *
-      </p>
+      <p>* TODO *</p>
 
       <p>
         <input type="file" onChange={handleFileChange} />
         {selectedFile && <p>Selected file: {selectedFile.name}</p>}
         <button onClick={handleUpload}>upload</button>
-        {uploadStatus && <p>{uploadStatus}</p>}
+        {uploadStatus && (
+          <span>
+            <br />
+            {uploadStatus}
+          </span>
+        )}
       </p>
 
       {folderContent ? (
         <div>
-          <b>Filer: <button onClick={() => getFolderContent()}>Refresh</button></b>
+          <b>
+            Filer: <button onClick={() => getFolderContent()}>Refresh</button>
+          </b>
           <table>
             <tbody>
-              {
-                folderContent.map((fil) => (
-                  <tr key={fil.modified}>
-                    <td>{fil.name}</td>
-                    <td><button onClick={() => parseFile(fil.path)}>Les fil-innhold</button></td>
-                  </tr>
-                ))
-              }
+              {folderContent.map((fil) => (
+                <tr key={fil.modified}>
+                  <td>{fil.name}</td>
+                  <td>
+                    <button onClick={() => parseFile(fil.path)}>
+                      Les fil-innhold
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -185,10 +215,8 @@ const AddNewHarvest = () => {
       ) : null}
 
       {fileContent ? displayFileContent() : null}
-
     </>
   );
-
 };
-export default AddNewHarvest;
 
+export default PdfUpload;

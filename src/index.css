@@ -9,10 +9,11 @@
   -moz-osx-font-smoothing: grayscale;
 
   color-scheme: light dark;
-  background-image: url("./assets/bg_0.png");
+  background-image: url("../static/images/bg_0.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  background-attachment: fixed;
 
   --color1: #f9c7d4;
   --color2: #859e91;
@@ -25,6 +26,14 @@
 
   color: var(--text);
   background-color: var(--color5);
+}
+
+img.icon {
+  width: 20px;
+  margin: 0px 2px;
+}
+.pointer {
+  cursor: pointer;
 }
 
 input,
@@ -109,9 +118,6 @@ table {
 .border table th,
 .border table td {
   border-bottom: 1px solid var(--color2);
-}
-.cursor-pointer {
-  cursor: pointer;
 }
 
 @media (prefers-color-scheme: light) {
