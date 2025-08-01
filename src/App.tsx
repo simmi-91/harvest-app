@@ -10,7 +10,6 @@ import Navigation from "./components/Navigation";
 import HarvestView from "./components/HarvestView.js";
 import EditHarvestView from "./components/EditHarvestView";
 import AddNewHarvestView from "./components/AddNewHarvestView";
-import WeekYear from "./RetiredFiles/WeekYear";
 
 export const mainmenu = {
   harvest: {

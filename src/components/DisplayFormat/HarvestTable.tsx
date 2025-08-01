@@ -8,9 +8,10 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Tooltip } from "@mui/material";
 import { HarvestEntry, PlantEntry, NewHarvestEntry } from "../../types";
 import { Padding } from "@mui/icons-material";
+import YardOutlinedIcon from "@mui/icons-material/YardOutlined";
 
 export const HarvestTableWrap = ({
   children,
@@ -95,6 +96,10 @@ export const HarvestTableGroup = ({
         id="harvestHeaderRow"
         sx={{ backgroundColor: "#c3d0a8" }}
       >
+        <HarvestTableCell
+          sx={mainrowStyle}
+          children={undefined}
+        ></HarvestTableCell>
         <HarvestTableCell sx={mainrowStyle} align="left">
           Plante
         </HarvestTableCell>
@@ -111,23 +116,26 @@ export const HarvestTableGroup = ({
             id={harvestItem.id + "-main"}
             key={harvestItem.id + "-main"}
           >
-            <HarvestTableCell sx={mainrowStyle} align="left" size={"medium"}>
+            <HarvestTableCell sx={{ ...mainrowStyle, width: 10 }}>
               {plantData.find(
                 (plantItem) => plantItem.plant_id === harvestItem.plant_id
-              )?.harvest_info !== "" ? (
-                <img
-                  title="Se planteinfo"
-                  className="icon pointer"
-                  src="./static/images/leaf.png"
-                  onClick={() =>
-                    setShowPlantInfoId(
-                      showPlantInfoId === harvestItem.plant_id
-                        ? 0
-                        : harvestItem.plant_id
-                    )
-                  }
-                />
+              )?.harvest_info ? (
+                <Tooltip title="Se plante info">
+                  <YardOutlinedIcon
+                    aria-label="Se plante info"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() =>
+                      setShowPlantInfoId(
+                        showPlantInfoId === harvestItem.plant_id
+                          ? 0
+                          : harvestItem.plant_id
+                      )
+                    }
+                  />
+                </Tooltip>
               ) : null}
+            </HarvestTableCell>
+            <HarvestTableCell align="left" sx={mainrowStyle}>
               {harvestItem.name}
             </HarvestTableCell>
             <HarvestTableCell sx={mainrowStyle}>
@@ -151,25 +159,23 @@ export const HarvestTableGroup = ({
             harvestItem.location_json.map((item, i) => {
               return (
                 <HarvestTableRow key={idx + "_" + i} id={idx + "_" + i}>
-                  <HarvestTableCell sx={subrowStyle} align={"right"}>
-                    {item.adress}
-                  </HarvestTableCell>
-                  <HarvestTableCell sx={subrowStyle}>
-                    {item.position}
-                  </HarvestTableCell>
-                  <HarvestTableCell sx={subrowStyle}>
-                    {item.plot || ""}
-                  </HarvestTableCell>
                   <HarvestTableCell
                     sx={subrowStyle}
                     children={undefined}
                   ></HarvestTableCell>
+                  <HarvestTableCell colSpan={4} sx={subrowStyle} align={"left"}>
+                    <span style={{ display: "flex", flexDirection: "row" }}>
+                      <span style={{ width: "100px" }}>{item.adress}</span>
+                      <span style={{ width: "100px" }}>{item.position}</span>
+                      <span style={{ width: "150px" }}>{item.plot || ""}</span>
+                    </span>
+                  </HarvestTableCell>
                 </HarvestTableRow>
               );
             })
           ) : (
             <HarvestTableRow key={idx + "_tom"} id={idx + "_tom"}>
-              <HarvestTableCell colSpan={4} sx={subrowStyle} align={"right"}>
+              <HarvestTableCell colSpan={5} sx={subrowStyle} align={"right"}>
                 ingen JSON data eller feil ved render
               </HarvestTableCell>
             </HarvestTableRow>

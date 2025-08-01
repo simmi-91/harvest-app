@@ -42,6 +42,7 @@ export type PlantEntry = {
   year: number;
   category: string | null;
   variant: string | null;
+  image: string | null;
 };
 
 export type AdressEntry = {

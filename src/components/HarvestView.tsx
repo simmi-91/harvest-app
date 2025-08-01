@@ -1,8 +1,12 @@
 import React, { useEffect, useState, Fragment } from "react";
-import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
-import Divider from "@mui/material/Divider";
-import { CircularProgress, AppBar, Toolbar } from "@mui/material";
+import {
+  Stack,
+  Chip,
+  Divider,
+  CircularProgress,
+  AppBar,
+  Toolbar,
+} from "@mui/material";
 
 import PlantInfo from "./DisplayFormat/PlantInfo";
 import { HarvestTableGroup } from "./DisplayFormat/HarvestTable";
@@ -24,24 +28,27 @@ const HarvestView = ({
   week,
   year,
 }: HarvestViewProps) => {
-  const [loading, setLoading] = useState(true);
-  const [responseMessage, setResponseMessage] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const [activeAdress, setActiveAdress] = useState<Address>(address.alle);
-  const [activePosition, setActivePosition] = useState("");
+  const [activePosition, setActivePosition] = useState<string>("");
   const positionsFilter =
     addressPositions[activeAdress as keyof typeof addressPositions] || [];
 
   const [harvestablesOnly, setHarvestablesOnly] = useState(false);
-
   const [showPlantInfoId, setShowPlantInfoId] = useState<number>(0);
+
+  const [modifiedHarvestData, setModifiedHarvestData] = useState([
+    ...harvestData,
+  ]);
   const [filteredHarvestData, setFilteredHarvestData] = useState([
     ...harvestData,
   ]);
 
   useEffect(() => {
-    const filteredHarvestData = harvestData
+    const filtered = modifiedHarvestData
       .slice()
       .sort((a, b) => {
         if (a.plot_order !== b.plot_order) {
@@ -60,16 +67,27 @@ const HarvestView = ({
           (!harvestablesOnly || item.done == 0)
         );
       });
-    setFilteredHarvestData(filteredHarvestData);
+    setFilteredHarvestData(filtered);
 
     setLoading(false);
-  }, [activeAdress, activePosition, harvestablesOnly, harvestData]);
+    return () => {};
+  }, [activeAdress, activePosition, harvestablesOnly, modifiedHarvestData]);
+
+  useEffect(() => {
+    if (showPlantInfoId > 0) {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+    return () => {};
+  }, [showPlantInfoId]);
 
   const handleHarvestToggle = async (id: number) => {
     try {
       const currentHarvest = filteredHarvestData.find((item) => item.id === id);
       if (!currentHarvest) {
-        throw new Error("Harvest data not foundHøstedata ble ikke funnet");
+        throw new Error("Høstedata ble ikke funnet");
       }
       const isCurrentlyDone =
         typeof currentHarvest.done === "string"
@@ -94,12 +112,19 @@ const HarvestView = ({
       const result = await response.json();
 
       if (result.success) {
+        setModifiedHarvestData((prevData) =>
+          prevData.map((item) =>
+            item.id === id ? { ...item, done: newSetDone } : item
+          )
+        );
         setFilteredHarvestData((prevData) =>
           prevData.map((item) =>
             item.id === id ? { ...item, done: newSetDone } : item
           )
         );
-        setResponseMessage(`(id:${id}) ` + result.message);
+        setResponseMessage(
+          `( ${currentHarvest.id} ${currentHarvest.name} ) ${result.message}`
+        );
       } else {
         throw new Error(result.message);
       }
@@ -114,7 +139,7 @@ const HarvestView = ({
 
   const displayAdressFilter = () => {
     return (
-      <Stack direction="row" spacing={1} margin={1}>
+      <Stack direction="row" spacing={1}>
         {Object.keys(address).map((key, i) => {
           const displayAdress = address[key as keyof typeof address];
 
@@ -141,7 +166,7 @@ const HarvestView = ({
 
   const displaypositionFilter = () => {
     return (
-      <Stack direction="row" spacing={0.5} margin={1.5} padding={1}>
+      <Stack direction="row" spacing={0.5}>
         {positionsFilter.map((tab, i) => {
           let uniqeKey = "adress-" + tab;
           uniqeKey = uniqeKey.replace(/\s+/g, "");

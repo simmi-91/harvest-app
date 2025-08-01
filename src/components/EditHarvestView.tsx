@@ -65,45 +65,6 @@ const EditHarvestView = ({
   const [editJsonViewId, seteditJsonViewId] = useState<number>(0);
   const [updatedFields, setUpdatedFields] = useState<UpdatedFields>({});
 
-  /*
-  const filterHarvestData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      let filtered = [...harvestData];
-
-      if (week && year) {
-        filtered = filtered.filter(
-          (item) =>
-            item.week.toString()?.includes(week.toString()) &&
-            item.year.toString()?.includes(year.toString())
-        );
-      }
-
-      if (searchPlant) {
-        filtered = filtered.filter((item) => item.name === searchPlant);
-      }
-
-      if (searchLocation) {
-        if (searchLocation === "Tom") {
-          filtered = filtered.filter((item) => item.full_location == null);
-        } else {
-          filtered = filtered.filter((item) =>
-            item.full_location?.includes(searchLocation)
-          );
-        }
-      }
-
-      filtered = filtered.sort((a, b) => {
-        if (a.plot_order !== b.plot_order) {
-          return a.plot_order - b.plot_order;
-        }
-        return a.name.localeCompare(b.name);
-      });
-
-      setFilteredData(filtered);
-      setLoading(false);
-    }, 500);
-  };*/
   const getFilteredData = useCallback(() => {
     let filtered = [...harvestData];
 
@@ -201,8 +162,15 @@ const EditHarvestView = ({
       setResponseMessage(null);
       setError(null);
 
+      const currentHarvest = filteredData.find((item) => item.id === id);
+      if (!currentHarvest) {
+        throw new Error("Høstedata ble ikke funnet");
+      }
+
       if (!fields[id]) {
-        setResponseMessage("Ingen oppdaterte felt for id:" + id);
+        setResponseMessage(
+          `Ingen oppdaterte felt for ${currentHarvest.name} id: ${id}`
+        );
         return;
       }
 
@@ -210,7 +178,9 @@ const EditHarvestView = ({
       try {
         const result = await updateHarvestEntry(id, fields[id]);
         if (result.success) {
-          setResponseMessage("(id:" + id + ") " + result.message);
+          setResponseMessage(
+            `( ${currentHarvest.id} ${currentHarvest.name} ) ${result.message}`
+          );
           setFilteredData((prevData) =>
             prevData.map((item) =>
               item.id === id ? { ...item, ...fields[id] } : item

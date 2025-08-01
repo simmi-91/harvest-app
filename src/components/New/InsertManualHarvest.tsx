@@ -595,6 +595,7 @@ du vil
             justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
+            backgroundColor: "rgba(240, 238, 226, 0.5)",
           }}
         >
           <CardContent>
