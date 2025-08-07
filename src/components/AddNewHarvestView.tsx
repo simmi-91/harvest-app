@@ -11,14 +11,16 @@ type AddNewHarvestProps = {
   manualHarvestTextInput: string;
   setManualHarvestTextInput: (text: string) => void;
   refetchPlants: () => Promise<void>;
+  triggerSearch: () => void;
 };
 const AddNewHarvestView = ({
   week,
   year,
   plantData,
-  refetchPlants,
   manualHarvestTextInput,
   setManualHarvestTextInput,
+  refetchPlants,
+  triggerSearch,
 }: AddNewHarvestProps) => {
   return (
     <Stack
@@ -40,6 +42,7 @@ const AddNewHarvestView = ({
         refetchPlants={refetchPlants}
         manualHarvestTextInput={manualHarvestTextInput}
         setManualHarvestTextInput={setManualHarvestTextInput}
+        triggerSearch={triggerSearch}
       />
     </Stack>
   );

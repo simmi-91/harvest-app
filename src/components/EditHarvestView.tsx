@@ -174,7 +174,6 @@ const EditHarvestView = ({
         return;
       }
 
-      setResponseMessage("Oppdaterer id:" + id + "...");
       try {
         const result = await updateHarvestEntry(id, fields[id]);
         if (result.success) {
@@ -339,7 +338,10 @@ const EditHarvestView = ({
                     key: harvestItem.id + "_" + 1,
                     text: (
                       <Button
-                        onClick={() => removeHarvestEntry(harvestItem.id)}
+                        onClick={() => {
+                          removeHarvestEntry(harvestItem.id);
+                          triggerSearch();
+                        }}
                         size="medium"
                         variant="outlined"
                       >
@@ -413,7 +415,10 @@ const EditHarvestView = ({
                   <Button
                     size="small"
                     sx={{ margin: "2px" }}
-                    onClick={() => handleSaveHarvestData(harvestItem.id)}
+                    onClick={() => {
+                      handleSaveHarvestData(harvestItem.id);
+                      triggerSearch();
+                    }}
                     variant="outlined"
                   >
                     Lagre

@@ -147,9 +147,16 @@ function App() {
 
   useEffect(() => {
     loadData();
-
     return () => {};
   }, [currentWeek, currentYear]);
+
+  useEffect(() => {
+    //changes has been made - refetch data when navigating
+    if (searchTrigger > 0) {
+      loadData();
+    }
+    return () => {};
+  }, [activeTab]);
 
   useEffect(() => {
     //console.log("manualHarvestTextInput", manualHarvestTextInput);
@@ -199,15 +206,17 @@ function App() {
               plantData={plantData}
               week={currentWeek}
               year={currentYear}
+              triggerSearch={triggerSearch}
             />
           ) : activeTab === "legg inn" ? (
             <AddNewHarvestView
               week={currentWeek}
               year={currentYear}
               plantData={plantData}
-              refetchPlants={refetchPlants}
               manualHarvestTextInput={manualHarvestTextInput}
               setManualHarvestTextInput={setManualHarvestTextInput}
+              refetchPlants={refetchPlants}
+              triggerSearch={triggerSearch}
             />
           ) : activeTab === "rediger" && activeSubTab === "planter" ? (
             <>rediger planter - TODO</>

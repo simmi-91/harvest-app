@@ -32,17 +32,19 @@ type InsertManualHarvestProps = {
   week: number;
   year: number;
   plantData: PlantEntry[];
-  refetchPlants: () => Promise<void>;
   manualHarvestTextInput: string;
   setManualHarvestTextInput: (text: string) => void;
+  refetchPlants: () => Promise<void>;
+  triggerSearch: () => void;
 };
 const InsertManualHarvest = ({
   week,
   year,
   plantData,
-  refetchPlants,
   manualHarvestTextInput,
   setManualHarvestTextInput,
+  refetchPlants,
+  triggerSearch,
 }: InsertManualHarvestProps) => {
   const [responseMessageType, setResponseMessageType] = useState<
     "info" | "error" | "success"
@@ -447,7 +449,10 @@ du vil
             <Button
               size="small"
               variant="contained"
-              onClick={() => addNewPlants()}
+              onClick={() => {
+                addNewPlants();
+                triggerSearch();
+              }}
             >
               Legg til nye planter
             </Button>
@@ -508,7 +513,10 @@ du vil
           <Button
             size="small"
             variant="contained"
-            onClick={() => handleAddHarvestData()}
+            onClick={() => {
+              handleAddHarvestData();
+              triggerSearch();
+            }}
             disabled={
               isValidJson && jsonHarvestData && jsonHarvestData.length > 0
                 ? false

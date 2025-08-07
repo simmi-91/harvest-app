@@ -20,6 +20,7 @@ type HarvestViewProps = {
   plantData: PlantEntry[];
   week: number;
   year: number;
+  triggerSearch: () => void;
 };
 
 const HarvestView = ({
@@ -27,6 +28,7 @@ const HarvestView = ({
   plantData,
   week,
   year,
+  triggerSearch,
 }: HarvestViewProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [responseMessage, setResponseMessage] = useState<string>("");
@@ -201,6 +203,7 @@ const HarvestView = ({
             showPlantInfoId={showPlantInfoId}
             handleHarvestToggle={handleHarvestToggle}
             setShowPlantInfoId={setShowPlantInfoId}
+            triggerSearch={triggerSearch}
           />
         </Stack>
       );

@@ -83,12 +83,14 @@ export const HarvestTableGroup = ({
   showPlantInfoId,
   handleHarvestToggle,
   setShowPlantInfoId,
+  triggerSearch,
 }: {
   harvestData: HarvestEntry[];
   plantData: PlantEntry[];
   showPlantInfoId: number;
   handleHarvestToggle: (id: number) => Promise<void>;
   setShowPlantInfoId: (id: number) => void;
+  triggerSearch: () => void;
 }) => (
   <HarvestTableWrap>
     <HarvestTableHead>
@@ -147,7 +149,10 @@ export const HarvestTableGroup = ({
             <HarvestTableCell sx={mainrowStyle}>
               <Button
                 size="small"
-                onClick={() => handleHarvestToggle(harvestItem.id)}
+                onClick={() => {
+                  handleHarvestToggle(harvestItem.id);
+                  triggerSearch();
+                }}
                 variant={+harvestItem.done === 1 ? "outlined" : "contained"}
               >
                 {+harvestItem.done === 1 ? "Ja" : "Nei"}
