@@ -14,6 +14,7 @@ import { harvestApi } from "../Utils/Paths";
 
 import { HarvestEntry, PlantEntry } from "../types";
 import { address, addressPositions, type Address } from "../App";
+import { HarvestGrid } from "./DisplayFormat/HarvestGrid";
 
 type HarvestViewProps = {
   harvestData: HarvestEntry[];
@@ -196,16 +197,14 @@ const HarvestView = ({
       return <em>Ingen data for uke: {week}</em>;
     } else {
       return (
-        <Stack spacing={1} marginBottom={20}>
-          <HarvestTableGroup
-            harvestData={filteredHarvestData}
-            plantData={plantData}
-            showPlantInfoId={showPlantInfoId}
-            handleHarvestToggle={handleHarvestToggle}
-            setShowPlantInfoId={setShowPlantInfoId}
-            triggerSearch={triggerSearch}
-          />
-        </Stack>
+        <HarvestGrid
+          harvestData={filteredHarvestData}
+          plantData={plantData}
+          showPlantInfoId={showPlantInfoId}
+          handleHarvestToggle={handleHarvestToggle}
+          setShowPlantInfoId={setShowPlantInfoId}
+          triggerSearch={triggerSearch}
+        />
       );
     }
   };
