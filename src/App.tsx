@@ -7,9 +7,9 @@ import { PlantEntry, HarvestEntry } from "./types";
 
 import Header from "./components/Header";
 import Navigation from "./components/Navigation";
-import HarvestView from "./components/HarvestView.js";
-import EditHarvestView from "./components/EditHarvestView";
-import AddNewHarvestView from "./components/AddNewHarvestView";
+import HarvestView from "./components/Pages/HarvestView.js";
+import EditHarvestView from "./components/Pages/EditHarvestView";
+import AddNewHarvestView from "./components/Pages/AddNewHarvestView";
 
 export const mainmenu = {
   harvest: {
@@ -84,35 +84,25 @@ function App() {
         throw new Error("Fikk ikke ut høstedata");
       }
 
-      const fixedHarvests = newHarvests
-        .sort((a, b) => {
-          if (a.week !== b.week) {
-            return a.week - b.week;
+      const fixedHarvests = newHarvests.map((item) => {
+        const strLocation = item.location_json;
+        if (strLocation && typeof strLocation === "string") {
+          try {
+            const jsonLocation = JSON.parse(strLocation);
+            return {
+              ...item,
+              location_json: jsonLocation,
+            };
+          } catch (error) {
+            console.error("Error parsing location_json:", error);
+            return {
+              ...item,
+              location_json: null,
+            };
           }
-          if (a.plot_order !== b.plot_order) {
-            return a.plot_order - b.plot_order;
-          }
-          return a.name.localeCompare(b.name);
-        })
-        .map((item) => {
-          const strLocation = item.location_json;
-          if (strLocation && typeof strLocation === "string") {
-            try {
-              const jsonLocation = JSON.parse(strLocation);
-              return {
-                ...item,
-                location_json: jsonLocation,
-              };
-            } catch (error) {
-              console.error("Error parsing location_json:", error);
-              return {
-                ...item,
-                location_json: null,
-              };
-            }
-          }
-          return item;
-        });
+        }
+        return item;
+      });
 
       setHarvestData(fixedHarvests);
       setPlantsData(newPlants);
