@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import {
   Stack,
   Card,
@@ -23,24 +23,25 @@ type PlantInfoProps = {
   setShowPlantInfoId: (id: number) => void;
 };
 const PlantInfo = ({ id, plantData, setShowPlantInfoId }: PlantInfoProps) => {
+  const [imageExists, setImageExists] = useState<boolean>(true);
   const activePlant: PlantEntry | undefined = plantData.find(
     (plantItem) => id === plantItem.plant_id
   );
 
   return (
-    <Stack direction="column" spacing={2} margin={1}>
+    <Stack direction="column" spacing={2} margin={1} className="whiteBg">
       {activePlant ? (
         <Card
           sx={{
             minWidth: "200px",
             maxHeight: "300px",
             overflowY: "auto",
-            backgroundColor: "rgba(240, 238, 226, 0.5)",
+            background: "transparent",
           }}
         >
           <CardHeader
             avatar={<EmojiNatureTwoToneIcon />}
-            title={activePlant.name}
+            title={<Typography variant="h5">{activePlant.name}</Typography>}
             subheader={activePlant.latin}
             action={
               <IconButton
@@ -50,6 +51,7 @@ const PlantInfo = ({ id, plantData, setShowPlantInfoId }: PlantInfoProps) => {
                 <CloseRoundedIcon />
               </IconButton>
             }
+            className="greenBg"
             sx={{ borderBottom: "thin solid gray" }}
           />
 
@@ -79,7 +81,7 @@ const PlantInfo = ({ id, plantData, setShowPlantInfoId }: PlantInfoProps) => {
                 </>
               ) : null}
             </CardContent>
-            {activePlant.image ? (
+            {imageExists ? (
               <CardMedia
                 component="img"
                 sx={{
@@ -88,9 +90,11 @@ const PlantInfo = ({ id, plantData, setShowPlantInfoId }: PlantInfoProps) => {
                   maxHeight: "400px",
                   maxWidth: "400px",
                   flexShrink: 0,
+                  padding: "5px 5px 10px 5px",
                 }}
-                image="/static/images/leaf.png"
+                image={`/static/images/plants/${activePlant.plant_id}.png`}
                 alt={activePlant.name}
+                onError={() => setImageExists(false)}
               />
             ) : null}
           </Box>
