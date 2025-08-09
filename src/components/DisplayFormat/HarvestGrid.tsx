@@ -36,10 +36,6 @@ const b = {
   fontWeight: "bold",
 };
 
-const bgW = {
-  backgroundColor: "rgba(240, 238, 226, 0.5)",
-};
-
 const aSize = {
   xs: 4,
   md: 3,
@@ -69,14 +65,7 @@ export const HarvestGrid = ({
   triggerSearch: () => void;
 }) => (
   <Box component={Paper} sx={{ width: "100%", background: "transparent" }}>
-    <Grid
-      container
-      spacing={0}
-      padding={1}
-      sx={{
-        backgroundColor: "#c3d0a8",
-      }}
-    >
+    <Grid container spacing={0} padding={1} className="greenBg">
       {/* Header */}
       <Grid size={1} sx={b}></Grid>
       <Grid size={3} sx={{ ...b, textAlign: "left" }}>
@@ -104,7 +93,7 @@ export const HarvestGrid = ({
     </Grid>
 
     {harvestData.map((harvestItem) => (
-      <Grid container spacing={0} key={harvestItem.id} sx={{ ...bgW }}>
+      <Grid container spacing={0} key={harvestItem.id} className="whiteBg">
         {/* Harvest row */}
         <Grid size={1} sx={{ ...mainrowStyle }}>
           {plantData.find(
