@@ -201,7 +201,7 @@ du vil
                 const validPositions: string[] =
                   addressPositions[address.ulvenPark];
                 const pos = findClosestPosition(line, validPositions);
-                const match = plotAndAmount.match(/Kasse (\S+)(.*?)$/i);
+                const match = plotAndAmount.match(/Kasse\s+(\S+)(.*?)$/i);
 
                 let plot = "";
                 if (match && match[1]) {
