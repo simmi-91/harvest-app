@@ -110,7 +110,7 @@ const Header = ({
             </Button>
           )}
           <TextField
-            label="Week"
+            label="Uke"
             value={inputWeek}
             onChange={handleWeekInputChange}
             size="small"
@@ -128,7 +128,7 @@ const Header = ({
           )}
 
           <TextField
-            label="Year"
+            label="År"
             value={inputYear}
             onChange={handleYearInputChange}
             size="small"
