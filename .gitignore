@@ -12,6 +12,7 @@ dist
 dist-ssr
 .env
 *.local
+public/static/images/plants/*
 
 # Editor directories and files
 .vscode/*
