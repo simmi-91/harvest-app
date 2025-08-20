@@ -304,6 +304,7 @@ export const HarvestTableGroupNewEntry = ({
             <HarvestTableCell
               sx={subrowStyle}
               children={undefined}
+              colSpan={2}
             ></HarvestTableCell>
           </HarvestTableRow>
           {harvestItem.location_json.map((item, i) => {
@@ -321,6 +322,7 @@ export const HarvestTableGroupNewEntry = ({
                 <HarvestTableCell
                   sx={subrowStyle}
                   children={undefined}
+                  colSpan={2}
                 ></HarvestTableCell>
               </HarvestTableRow>
             );

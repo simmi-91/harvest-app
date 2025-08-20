@@ -179,7 +179,7 @@ du vil
 
               //address // position // plot
               const plotAndAmountArr =
-                line.match(/(?:Ulven T|Kasse)(.+)$/gi) ?? [];
+                line.match(/(?:Ulven T|Kasse|Hagelagsrommet)(.+)$/gi) ?? [];
               let plotAndAmount = plotAndAmountArr[0] ?? "";
               plotAndAmount = plotAndAmount.replace(/([-+])\s/g, `$1`);
 
@@ -189,13 +189,22 @@ du vil
                   addressPositions[address.ulvenT];
                 const pos = findClosestPosition(line, validPositions);
                 const match = plotAndAmount.match(/(Ulven T[. ]*)(.*?)$/i);
-
                 if (match && match[2]) {
                   amount = match[2];
                 }
                 return {
                   adress: address.ulvenT,
                   position: pos,
+                };
+              } else if (line.match(/Hagelagsrommet/gi)) {
+                const match = plotAndAmount.match(/(Hagelagsrommet)(.*?)$/i);
+                if (match && match[2]) {
+                  amount = match[2];
+                }
+                return {
+                  adress: address.hagerom,
+                  position: "",
+                  plot: "",
                 };
               } else if (line.match(/Kasse/gi)) {
                 const validPositions: string[] =

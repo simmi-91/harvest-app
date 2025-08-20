@@ -1,4 +1,6 @@
 import { PlantEntry } from "../types";
+import { address } from "../App";
+
 export const cleanNewHarvestInput = (
   inputData: string,
   setInputData: (text: string) => void,
@@ -22,6 +24,7 @@ export const cleanNewHarvestInput = (
         /(Grønnsak[ ]*)?(Bednr[. ]*)?(Enkeltandel[\/ ]*parandel[ ]*)?(Familieandel[ ]*)?/gi,
       replacement: "",
     },
+    { pattern: /Hagelags\s*rommet/g, replacement: address.hagerom },
   ];
   replacements.forEach(({ pattern, replacement }) => {
     formattedData = formattedData.replace(pattern, replacement);
