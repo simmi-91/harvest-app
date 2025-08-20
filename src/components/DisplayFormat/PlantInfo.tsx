@@ -92,7 +92,7 @@ const PlantInfo = ({ id, plantData, setShowPlantInfoId }: PlantInfoProps) => {
                   flexShrink: 0,
                   padding: "5px 5px 10px 5px",
                 }}
-                image={`/static/images/plants/${activePlant.plant_id}.png`}
+                image={`./static/images/plants/${activePlant.plant_id}.png`}
                 alt={activePlant.name}
                 onError={() => setImageExists(false)}
               />
