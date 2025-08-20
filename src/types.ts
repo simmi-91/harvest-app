@@ -29,7 +29,7 @@ export type NewHarvestEntry = {
 
 export type LocationEntry = {
   adress: string;
-  position: string;
+  position?: string;
   plot?: string;
 };
 

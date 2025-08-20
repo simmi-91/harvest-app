@@ -15,7 +15,7 @@ export const findClosestPosition = (
   return similarities[0]?.position || validPositions[0] || "";
 };
 
-export const calculateSimilarity = (str1: string, str2: string): number => {
+const calculateSimilarity = (str1: string, str2: string): number => {
   const longer = str1.length > str2.length ? str1 : str2;
   const shorter = str1.length > str2.length ? str2 : str1;
 

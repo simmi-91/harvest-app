@@ -36,6 +36,7 @@ export const fetchHarvestData = async (
     if (week && week > 0) {
       url += `&week=${week}`;
     }
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(

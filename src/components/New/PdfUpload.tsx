@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { pdfparserApi, uploadPdfApi } from "../Utils/Paths";
+import { pdfparserApi, uploadPdfApi } from "../../Utils/Paths";
 import { TextField, Stack, Button } from "@mui/material";
-import { Event } from "../types";
+import { Event } from "../../types";
 
 type fileEntry = {
   modified: number;

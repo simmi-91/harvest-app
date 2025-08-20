@@ -8,7 +8,6 @@ import {
   Toolbar,
 } from "@mui/material";
 
-import { updateHarvestEntry } from "../../Utils/DataFetching";
 import { HarvestEntry, AdressEntry, LocationEntry } from "../../types";
 
 type EditorProps = {
@@ -33,16 +32,24 @@ const JsonEditor = ({
   ];
   const allPositions = [...new Set(addressPositions["Alle"])];
 
-  const getInitialEntries = (data: LocationEntry[]): LocationEntry[] => {
-    if (data && typeof data === "object") {
-      return data;
+  const getInitialEntries = (
+    data: LocationEntry[] | string
+  ): LocationEntry[] => {
+    try {
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (typeof data === "string" && data.trim() !== "") {
+        return JSON.parse(data);
+      }
+    } catch (error) {
+      console.error(
+        "Invalid location_json, falling back to default",
+        error,
+        data
+      );
     }
-    if (data && typeof data === "string") {
-      const jsonLocation = JSON.parse(data);
-      return JSON.parse(jsonLocation);
-    }
-    const jsonObj = [{ plot: "", adress: "", position: "" }];
-    return jsonObj;
+    return [{ plot: "", adress: "", position: "" }];
   };
 
   const [entries, setEntries] = useState<LocationEntry[]>(
@@ -85,7 +92,7 @@ const JsonEditor = ({
     value: string | null
   ) => {
     const updatedEntries = entries.map((entry, i) =>
-      i === index ? { ...entry, [field]: value } : entry
+      i === index ? { ...entry, [field]: value ?? "" } : entry
     );
     setEntries(updatedEntries);
   };
@@ -107,6 +114,7 @@ const JsonEditor = ({
   const saveJsonChanges = () => {
     const initialentries = getInitialEntries(initialData);
 
+    console.log(JSON.stringify(initialentries), JSON.stringify(entries));
     if (JSON.stringify(initialentries) === JSON.stringify(entries)) {
       setResponseMessage("Ingen oppdatert JSON for id:" + harvestid);
       setTimeout(() => setResponseMessage(null), 5000);
@@ -198,9 +206,9 @@ const JsonEditor = ({
             </Stack>
 
             <Autocomplete
-              value={entry.adress}
+              value={entry.adress || ""}
               onChange={(e, newValue) => {
-                handleInputChange(index, "address", newValue);
+                handleInputChange(index, "adress", newValue);
               }}
               options={uniqueAddresses}
               renderInput={(params) => (
@@ -210,7 +218,7 @@ const JsonEditor = ({
             />
 
             <Autocomplete
-              value={entry.position}
+              value={entry.position || ""}
               onChange={(e, newValue) => {
                 handleInputChange(index, "position", newValue);
               }}

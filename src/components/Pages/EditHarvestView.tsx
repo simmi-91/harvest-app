@@ -181,9 +181,21 @@ const EditHarvestView = ({
             `( ${currentHarvest.id} ${currentHarvest.name} ) ${result.message}`
           );
           setFilteredData((prevData) =>
-            prevData.map((item) =>
-              item.id === id ? { ...item, ...fields[id] } : item
-            )
+            prevData.map((item) => {
+              if (item.id !== id) return item;
+              const merged = { ...item, ...fields[id] } as any;
+              if (
+                typeof merged.location_json === "string" &&
+                merged.location_json.trim() !== ""
+              ) {
+                try {
+                  merged.location_json = JSON.parse(merged.location_json);
+                } catch (e) {
+                  // leave as-is if parsing fails
+                }
+              }
+              return merged;
+            })
           );
         } else {
           throw new Error(result.message);

@@ -28,6 +28,13 @@
   background-color: var(--color5);
 }
 
+.greenBg {
+  background-color: #c3d0a8;
+}
+.whiteBg {
+  background-color: rgba(240, 238, 226, 0.5);
+}
+
 img.icon {
   width: 20px;
   margin: 0px 2px;

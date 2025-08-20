@@ -33,6 +33,7 @@ export const mainmenu = {
 export const address = {
   ulvenPark: "Ulvenpark",
   ulvenT: "Ulven T",
+  hagerom: "Hagelagsrommet",
   alle: "Alle",
 } as const;
 export type Address = (typeof address)[keyof typeof address];
@@ -43,6 +44,7 @@ export type AddressPositions = {
 export const addressPositions = {
   [address.ulvenPark]: ["B", "F", "L"],
   [address.ulvenT]: ["Tak", "Åker"],
+  [address.hagerom]: [],
   [address.alle]: ["B", "F", "L", "Tak", "Åker"],
 } as const satisfies AddressPositions;
 
@@ -153,7 +155,7 @@ function App() {
   }, [manualHarvestTextInput]);
 
   return (
-    <Stack direction="column">
+    <Stack direction="column" paddingBottom={10}>
       <Navigation
         activeTab={activeTab}
         setActiveTab={setActiveTab}
